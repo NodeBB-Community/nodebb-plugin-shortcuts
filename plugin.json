@@ -1,0 +1,23 @@
+{
+  "id": "nodebb-plugin-shortcuts",
+  "name": "NodeBB Shortcuts",
+  "description": "Adds shortcuts to NodeBB",
+  "url": "https://github.com/frissdiegurke/nodebb-plugin-shortcuts",
+  "library": "./index.js",
+  "scripts": [
+    "./client-scripts/shortcuts.js",
+    "./client-scripts/shortcuts_main.js"
+  ],
+  "templates": "./templates",
+  "hooks": [
+    {
+      "hook": "action:plugin.activate",
+      "method": "configDefaults"
+    },
+    {
+      "hook": "action:app.load",
+      "method": "appLoad"
+    }
+  ],
+  "minver": "0.4.0"
+}
