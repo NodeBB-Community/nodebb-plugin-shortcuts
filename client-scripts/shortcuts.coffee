@@ -69,7 +69,7 @@
           parseBindings target, keyName, fullName
         else
           target.push new KeyAction(keyName, fullName)
-    version: '0.0.1-1'
+    version: '0.0.1-2'
     bindings: []
     actions: {}
     parseCfg: (cfg) ->
