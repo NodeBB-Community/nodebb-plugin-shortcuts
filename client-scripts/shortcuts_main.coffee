@@ -10,6 +10,18 @@
   blurFocus = ->
     $('*:focus').blur()
 
+  navPills =
+    next: (nP) ->
+      isNext = nP.last().hasClass 'active'
+      for pill in nP.toArray()
+        $('>a', pill)[0].click() if isNext
+        isNext = $(pill).hasClass 'active'
+    prev: (nP) ->
+      isNext = nP.first().hasClass 'active'
+      for pill in nP.toArray().reverse()
+        $('>a', pill)[0].click() if isNext
+        isNext = $(pill).hasClass 'active'
+
   shortcuts.addActions
   # dialog
     dialog_confirm: ->
@@ -95,16 +107,10 @@
   # navPills
     navPills_next: ->
       nP = $ '>li', $('.nav-pills')[0]
-      isNext = nP.last().hasClass 'active'
-      for pill in nP.toArray()
-        $('>a', pill)[0].click() if isNext
-        isNext = $(pill).hasClass 'active'
+      if nP.css('float') == 'right' then navPills.prev nP else navPills.next nP
     navPills_prev: ->
       nP = $ '>li', $('.nav-pills')[0]
-      isNext = nP.first().hasClass 'active'
-      for pill in nP.toArray().reverse()
-        $('>a', pill)[0].click() if isNext
-        isNext = $(pill).hasClass 'active'
+      if nP.css('float') == 'right' then navPills.next nP else navPills.prev nP
   # header
     header_home: ->
       ajaxify.go ''
@@ -121,7 +127,7 @@
     header_chats: ->
       $('#chat_dropdown').click()
     header_profile: ->
-      ajaxify.go "users/#{app.username}"
+      ajaxify.go "user/#{app.username}"
   # body
     body_focus: ->
       blurFocus()
