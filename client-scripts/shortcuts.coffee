@@ -1,6 +1,7 @@
 (->
   debug = false
-  _dbg = -> console.log "Shortcuts DEBUG -", arguments...
+  _dbg = ->
+    console.log "Shortcuts DEBUG -", arguments...
   dbg = -> _dbg arguments... if debug
   dbg "Debug-mode is set."
 
@@ -31,7 +32,8 @@
         when 219 then '['
         when 220 then '\\'
         when 221 then ']'
-        else "##{code}"
+        else
+          "##{code}"
 
   class KeyAction
     keyCode: false
@@ -46,13 +48,21 @@
       parts = keyName.split '-'
       this.keyCode = +parts[parts.length - 1]
       for k,i in parts when i != parts.length - 1
-        switch k.toUpperCase()
-          when 'C' then this.keyString += "Ctrl"; ctrl = true
-          when 'A' then this.keyString += "Alt"; alt = true
-          when 'S' then this.keyString += "Shift"; shift = true
-          when 'M' then this.keyString += "Meta"; meta = true
+        this.keyString += switch k.toUpperCase()
+          when 'C'
+            ctrl = true;
+            'Ctrl+'
+          when 'A'
+            alt = true;
+            'Alt+'
+          when 'S'
+            shift = true;
+            'Shift+'
+          when 'M'
+            meta = true;
+            'Meta+'
           else
-        this.keyString += "+"
+            ''
       this.keyString += convertKeyCodeToChar this.keyCode
       this.matches = (event, key, input) ->
         event.ctrlKey == ctrl && event.altKey == alt && event.shiftKey == shift && event.metaKey == meta &&

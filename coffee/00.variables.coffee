@@ -1,13 +1,22 @@
-reset = false
-repairConfig = false
+ModulesSockets = module.parent.require './socket.io/modules'
+Configuration = require './services/Configuration'
+Route = require './services/Route'
+
 debug = false
+forceUpdate = false
+reset = false
 
-configPrefix = "shortcuts:"
-
-pluginId = 'nodebb-plugin-shortcuts'
-
-defaultConfig =
+plugin =
+  name: 'shortcuts'
   version: '0.0.1-7'
+  adminPage:
+    name: 'Shortcuts'
+    icon: 'fa-keyboard-o'
+
+plugin.id = "nodebb-plugin-#{plugin.name}"
+plugin.adminPage.route = "/plugins/#{plugin.name}"
+
+defConfig =
   select_chars: 'werasdfguiohjklnm'
   actions:
     dialog:
@@ -68,6 +77,8 @@ defaultConfig =
         top: ['84'] # t
         bottom: ['66'] # b
 
+cfg = new Configuration plugin, defConfig, debug, forceUpdate, reset
+
 descriptions =
   body:
     _title: "Basic actions"
@@ -124,71 +135,3 @@ descriptions =
     closeAll: "Close all tasks"
     clickFirst: "Toggle first task"
     clickLast: "Toggle last task"
-
-stringify = (val) ->
-  if val instanceof Object then JSON.stringify(val) else val
-
-parse = (val, defVal) ->
-  type = typeof defVal
-  switch type
-    when 'boolean' then val && val != 'false'
-    when 'object'
-      try
-        val = JSON.parse val
-      val
-    else
-      val
-
-getConfig = (key = null, def = null) ->
-  if !key
-    obj = {}
-    obj[k] = getConfig k, v for k, v of defaultConfig
-    return obj
-  if !def?
-    def = defaultConfig[key]
-  val = meta.config[configPrefix + key]
-  if val then parse val, def else def
-
-setConfig = (key, val) ->
-  meta.configs.set configPrefix + key, stringify(val), ->
-
-module.exports.configDefaults = (id) ->
-  if id == pluginId
-    meta.configs.setOnEmpty configPrefix + key, stringify(val), (->) for key, val of defaultConfig
-
-if reset
-  meta.configs.list (ignored, obj) ->
-    meta.configs.remove key for key of obj when key.search(configPrefix) == 0
-    setConfig key, val for key, val of defaultConfig
-    if debug
-      setTimeout ->
-        console.log getConfig()
-      , 100
-else if repairConfig || getConfig('version', '0.0.0') != defaultConfig.version
-  console.log 'config gets repaired...' if debug
-  meta.configs.list (ignored, obj) ->
-    conf = getConfig()
-    merge = (obj1, obj2) ->
-      for key, val2 of obj2
-        val1 = obj1[key]
-        if !obj1.hasOwnProperty(key)
-          obj1[key] = val2
-        else if typeof val2 == 'object'
-          if typeof val1 == 'object'
-            merge val1, val2
-          else
-            obj1[key] = val2
-    merge conf, defaultConfig
-    conf.version = defaultConfig.version
-    meta.configs.remove key for key of obj when key.search(configPrefix) == 0
-    setConfig key, conf[key] for key of defaultConfig
-    if debug
-      setTimeout ->
-        console.log getConfig()
-      , 100
-else if debug
-  console.log getConfig()
-
-#appGet = (app, url, mw, cb) ->
-#  app.get url, mw, cb
-#  app.get "/api#{url}", cb
