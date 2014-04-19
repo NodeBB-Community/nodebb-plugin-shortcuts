@@ -9,7 +9,7 @@
   convertKeyCodeToChar = (code) ->
     code = +code
     if code >= 48 && code <= 90
-      String.fromCharCode(code).toLowerCase()
+      String.fromCharCode(code).toUpperCase()
     else if code >= 112 && code <= 123
       "F#{code - 111}"
     else
@@ -46,13 +46,13 @@
       parts = keyName.split '-'
       this.keyCode = +parts[parts.length - 1]
       for k,i in parts when i != parts.length - 1
-        this.keyString += "#{k}-"
         switch k.toUpperCase()
-          when 'C' then ctrl = true
-          when 'A' then alt = true
-          when 'S' then shift = true
-          when 'M' then meta = true
+          when 'C' then this.keyString += "Ctrl"; ctrl = true
+          when 'A' then this.keyString += "Alt"; alt = true
+          when 'S' then this.keyString += "Shift"; shift = true
+          when 'M' then this.keyString += "Meta"; meta = true
           else
+        this.keyString += "+"
       this.keyString += convertKeyCodeToChar this.keyCode
       this.matches = (event, key, input) ->
         event.ctrlKey == ctrl && event.altKey == alt && event.shiftKey == shift && event.metaKey == meta &&
@@ -120,10 +120,12 @@
               cb: action.cb
               bindings: b for b in this.bindings when b.action == actionName
     help: ->
-      return if document.querySelector '#shortcuts_help_body'
+      if document.querySelector '#shortcuts_help_body'
+        $('.bootbox-close-button', d).click() for d in getActiveDialogs()
+        return;
       height = window.innerHeight - 150
       height = 100 if !height || height < 100
-      msg = "<div id='shortcuts_help_body' style='height:#{height}px'><div>Note: A = Alt, C = Ctrl, S = Shift, M = Meta"
+      msg = "<div id='shortcuts_help_body' style='height:#{height}px'><div>"
       for i, m of this.helpMessages
         if typeof m == 'string'
           msg += "</ul>" if i
@@ -131,8 +133,8 @@
         else
           keys = (kA.keyString for kA in this.actions[m.name]?.bindings)
           if keys
-            keys = keys.join ', '
-            msg += "<li><div class='keys'>#{keys}</div><div class='description'>#{m.description}</div></li>"
+            keys = keys.join ' | '
+            msg += "<li class='clearfix'><div class='description'>#{m.description}</div><div class='keys'>#{keys}</div></li>"
       bootbox.dialog
         title: "NodeBB Shortcuts <small>#{this.version}</small>"
         message: msg + "</ul></div></div>"
@@ -177,7 +179,7 @@
       $(document).keypress (event) ->
         event = event || window.event
         return if inputNames.indexOf(event.target.tagName) >= 0
-        if 63 == (event.keyCode || event.which)
-          shortcuts.help()
+        key = event.which || event.keyCode || event.key
+        shortcuts.help() if key == 63
 #
 )()

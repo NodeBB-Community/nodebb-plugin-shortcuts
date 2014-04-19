@@ -2,25 +2,33 @@
   font-size: small;
   resize: vertical;
   overflow-y: scroll;
+
+  h4 {
+    margin: 0;
+  }
+
   ul {
     list-style: none;
-    padding: 0 20px;
+    padding: 5px 15px 0;
     li {
       border-top: 1px dotted #000000;
+      padding: 0 5px;
       &:last-child {
         border-bottom: 1px dotted #000000;
       }
+      &:hover {
+        background-color: rgba(0, 100, 0, 0.1);
+      }
 
       .keys {
-        min-width: 150px;
         font-family: monospace;
         text-align: right;
-        padding: 0 15px 0 2px;
-        float: left;
-        clear: left;
+        padding: 0 0 0 15px;
+        font-size: 10pt;
       }
       .description {
         font-weight: bold;
+        float: left;
       }
     }
   }
