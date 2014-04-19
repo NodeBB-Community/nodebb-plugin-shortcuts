@@ -59,21 +59,27 @@
           key == this.keyCode && (!input || ctrl || alt || meta || key == 27)
 
   class Shortcuts
-    parseBindings = (target, cfg, key) ->
+    addAction = (target, actions, keyAction) ->
+      target.push keyAction
+      actions[keyAction.action]?.bindings?.push keyAction
+    parseBindings = (target, actions, cfg, key) ->
+      action.bindings = [] for action in actions
       key += '_' if key
       for name, keyName of cfg
         fullName = key + name
         if keyName instanceof Array
-          target.push new KeyAction(kN, fullName) for kN in keyName
+          addAction target, actions, new KeyAction(kN, fullName) for kN in keyName
         else if keyName instanceof Object
-          parseBindings target, keyName, fullName
+          parseBindings target, actions, keyName, fullName
         else
-          target.push new KeyAction(keyName, fullName)
-    version: '0.0.1-2'
+          addAction target, actions, new KeyAction(keyName, fullName)
+    version: ''
     bindings: []
     actions: {}
+    helpMessages: []
     parseCfg: (cfg) ->
-      parseBindings this.bindings = [], cfg.actions, ''
+      this.version = cfg.version
+      parseBindings this.bindings = [], this.actions, cfg.actions, ''
     passEvent: (e, key) ->
       scopes = getActionScopes()
       dbg "Scopes matching event-target: " + scopes
@@ -97,33 +103,39 @@
         str += "#{kA.action}, " for kA in matchingBindings
         dbg "#{str[..str.length - 3]}] match" + (if matchingBindings.length == 1 then "es" else '') + ' the key-event'
       for kA in matchingBindings
-        if this.actions[kA.action]?.call(e.target, this, e) != false
+        if this.actions[kA.action]?.cb?.call(e.target, this, e) != false
           dbg "'#{kA.action}' got triggered"
           return;
       dbg 'No action got triggered'
     addActions: (obj) ->
       for k, v of obj
-        this.actions[k] = v
+        this.helpMessages.push v._title || ''
+        for name, action of v
+          if name != '_title'
+            actionName = "#{k}_#{name}"
+            this.helpMessages.push
+              name: actionName
+              description: action.description
+            this.actions[actionName] =
+              cb: action.cb
+              bindings: b for b in this.bindings when b.action == actionName
     help: ->
       return if document.querySelector '#shortcuts_help_body'
       height = window.innerHeight - 150
       height = 100 if !height || height < 100
-      style = "font-size:small;resize:vertical;overflow-y:scroll;height:#{height}px"
-      msg = "<div id='shortcuts_help_body' style='#{style}'>"
-      action = null
-      keys = null
-      style = "min-width:100px;font-family:monospace;text-align:right;padding:0 15px 0 2px;float:left;clear:left"
-      for kA in this.bindings
-        if action == kA.action
-          keys.push kA.keyString
+      msg = "<div id='shortcuts_help_body' style='height:#{height}px'><div>Note: A = Alt, C = Ctrl, S = Shift, M = Meta"
+      for i, m of this.helpMessages
+        if typeof m == 'string'
+          msg += "</ul>" if i
+          msg += "<h4>#{m}</h4><ul>"
         else
-          msg += "<div style='border-top: 1px dotted #000000'><div style='#{style}'>#{keys.join ', '}</div>" +
-            "<div style='font-weight:bold'>#{action}</div></div>" if keys
-          action = kA.action
-          keys = [kA.keyString]
+          keys = (kA.keyString for kA in this.actions[m.name]?.bindings)
+          if keys
+            keys = keys.join ', '
+            msg += "<li><div class='keys'>#{keys}</div><div class='description'>#{m.description}</div></li>"
       bootbox.dialog
         title: "NodeBB Shortcuts <small>#{this.version}</small>"
-        message: msg + "</div>"
+        message: msg + "</ul></div></div>"
 
   getActiveComposer = ->
     for c in document.querySelectorAll '.composer'
@@ -139,7 +151,7 @@
   getActionScopes = ->
     # dialog, composer, taskbar, breadcrumb, selection, navPills, scroll, header, topic, category
     scopes = []
-    return ['dialog'] if getActiveDialogs().length
+    return ['dialog', 'body'] if getActiveDialogs().length
     if getActiveComposer()
       scopes.push 'composer'
     else if $('.taskbar li[data-module="composer"]').length

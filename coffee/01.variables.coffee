@@ -1,4 +1,5 @@
 reset = false
+repairConfig = false
 debug = false
 
 configPrefix = "shortcuts:"
@@ -6,11 +7,12 @@ configPrefix = "shortcuts:"
 pluginId = 'nodebb-plugin-shortcuts'
 
 defaultConfig =
+  version: '0.0.1-4'
   select_chars: 'werasdfguiohjklnm'
   actions:
     dialog:
       confirm: ['89', '79', '90'] # y, o, z
-      cancel: ['78', '67', '27'] # n, c, Esc
+      close: ['78', '67', '27'] # n, c, Esc
     composer:
       send: ['A-83'] # A-s
       discard: ['A-68', 'S-27'] # A-d, S-Esc
@@ -73,13 +75,17 @@ parse = (val, defVal) ->
   type = typeof defVal
   switch type
     when 'boolean' then val && val != 'false'
-    when 'object' then JSON.parse val
-    else val
+    when 'object'
+      try
+        val = JSON.parse val
+      val
+    else
+      val
 
 getConfig = (key = null, def = null) ->
   if !key
     obj = {}
-    obj[k] = getConfig k for k of defaultConfig
+    obj[k] = getConfig k, v for k, v of defaultConfig
     return obj
   if !def?
     def = defaultConfig[key]
@@ -97,6 +103,28 @@ if reset
   meta.configs.list (ignored, obj) ->
     meta.configs.remove key for key of obj when key.search(configPrefix) == 0
     setConfig key, val for key, val of defaultConfig
+    if debug
+      setTimeout ->
+        console.log getConfig()
+      , 100
+else if repairConfig || getConfig('version', '0.0.0') != defaultConfig.version
+  console.log 'config gets repaired...' if debug
+  meta.configs.list (ignored, obj) ->
+    conf = getConfig()
+    merge = (obj1, obj2) ->
+      for key, val2 of obj2
+        val1 = obj1[key]
+        if !obj1.hasOwnProperty(key)
+          obj1[key] = val2
+        else if typeof val2 == 'object'
+          if typeof val1 == 'object'
+            merge val1, val2
+          else
+            obj1[key] = val2
+    merge conf, defaultConfig
+    conf.version = defaultConfig.version
+    meta.configs.remove key for key of obj when key.search(configPrefix) == 0
+    setConfig key, conf[key] for key of defaultConfig
     if debug
       setTimeout ->
         console.log getConfig()

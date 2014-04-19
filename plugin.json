@@ -9,6 +9,9 @@
     "./client-scripts/shortcuts_main.js"
   ],
   "templates": "./templates",
+  "less": [
+    "./styles/style.less"
+  ],
   "hooks": [
     {
       "hook": "action:plugin.activate",
