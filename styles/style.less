@@ -1,0 +1,27 @@
+#shortcuts_help_body {
+  font-size: small;
+  resize: vertical;
+  overflow-y: scroll;
+  ul {
+    list-style: none;
+    padding: 0 20px;
+    li {
+      border-top: 1px dotted #000000;
+      &:last-child {
+        border-bottom: 1px dotted #000000;
+      }
+
+      .keys {
+        min-width: 150px;
+        font-family: monospace;
+        text-align: right;
+        padding: 0 15px 0 2px;
+        float: left;
+        clear: left;
+      }
+      .description {
+        font-weight: bold;
+      }
+    }
+  }
+}

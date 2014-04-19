@@ -7,7 +7,7 @@ configPrefix = "shortcuts:"
 pluginId = 'nodebb-plugin-shortcuts'
 
 defaultConfig =
-  version: '0.0.1-4'
+  version: '0.0.1-5'
   select_chars: 'werasdfguiohjklnm'
   actions:
     dialog:
