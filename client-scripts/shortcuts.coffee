@@ -170,7 +170,7 @@
       shortcuts.parseCfg data
       $(document).keydown (event) ->
         event = event || window.event
-        key = event.key || event.keyCode
+        key = event.which || event.keyCode || event.key
         _dbg "Key Down: " + (if event.ctrlKey then 'C-' else '') + (if event.altKey then 'A-' else '') +
           (if event.shiftKey then 'S-' else '') + (if event.metaKey then 'M-' else '') + key if debug
         shortcuts.passEvent event, key
