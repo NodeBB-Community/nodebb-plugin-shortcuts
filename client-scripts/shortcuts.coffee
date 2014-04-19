@@ -76,9 +76,10 @@
     version: ''
     bindings: []
     actions: {}
-    helpMessages: []
+    helpMessages: {}
     parseCfg: (cfg) ->
       this.version = cfg.version
+      this.helpMessages = cfg.descriptions
       parseBindings this.bindings = [], this.actions, cfg.actions, ''
     passEvent: (e, key) ->
       scopes = getActionScopes()
@@ -109,16 +110,11 @@
       dbg 'No action got triggered'
     addActions: (obj) ->
       for k, v of obj
-        this.helpMessages.push v._title || ''
         for name, action of v
-          if name != '_title'
-            actionName = "#{k}_#{name}"
-            this.helpMessages.push
-              name: actionName
-              description: action.description
-            this.actions[actionName] =
-              cb: action.cb
-              bindings: b for b in this.bindings when b.action == actionName
+          actionName = "#{k}_#{name}"
+          this.actions[actionName] =
+            cb: action
+            bindings: b for b in this.bindings when b.action == actionName
     help: ->
       if document.querySelector '#shortcuts_help_body'
         $('.bootbox-close-button', d).click() for d in getActiveDialogs()
@@ -126,18 +122,18 @@
       height = window.innerHeight - 150
       height = 100 if !height || height < 100
       msg = "<div id='shortcuts_help_body' style='height:#{height}px'><div>"
-      for i, m of this.helpMessages
-        if typeof m == 'string'
-          msg += "</ul>" if i
-          msg += "<h4>#{m}</h4><ul>"
-        else
-          keys = (kA.keyString for kA in this.actions[m.name]?.bindings)
+      for scope, obj of this.helpMessages
+        msg += "<h4>#{obj._title}</h4><ul>"
+        for name, description of obj when name != '_title'
+          keys = (kA.keyString for kA in this.actions["#{scope}_#{name}"]?.bindings)
           if keys
             keys = keys.join ' | '
-            msg += "<li class='clearfix'><div class='description'>#{m.description}</div><div class='keys'>#{keys}</div></li>"
+            msg += "<li class='clearfix'><div class='description'>#{description}</div><div class='keys'>#{keys}</div></li>"
+        msg += "</ul>"
+      msg += "</ul></div></div>"
       bootbox.dialog
         title: "NodeBB Shortcuts <small>#{this.version}</small>"
-        message: msg + "</ul></div></div>"
+        message: msg
 
   getActiveComposer = ->
     for c in document.querySelectorAll '.composer'

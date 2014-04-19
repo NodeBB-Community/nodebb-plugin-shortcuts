@@ -68,6 +68,63 @@ defaultConfig =
         top: ['84'] # t
         bottom: ['66'] # b
 
+descriptions =
+  body:
+    _title: "Basic actions"
+    focus: "Blur focused element"
+    scroll_pageDown: "Scroll one page down"
+    scroll_pageUp: "Scroll one page up"
+    scroll_top: "Scroll to top"
+    scroll_bottom: "Scroll to bottom"
+  header:
+    _title: "Navigation"
+    home: "Go to home-site"
+    unread: "Go to unread-site"
+    recent: "Go to recent-site"
+    popular: "Go to popular-site"
+    users: "Go to users-site"
+    notifications: "Go to notifications-site"
+    profile: "Go to profile-site"
+    chats: "Open chat-popup"
+  navPills:
+    _title: "Sub-navigation (nav-pills)"
+    next: "Select next pill"
+    prev: "Select previous pill"
+  breadcrumb:
+    _title: "Navigate upwards (breadcrumb)"
+    up: "Navigate upwards (topic -> category -> home)"
+  category:
+    _title: "Actions within a Category"
+    newTopic: "Create a new Topic"
+  topic:
+    _title: "Actions within a Topic"
+    reply: "Create a new reply"
+    threadTools: "Open Thread Tools"
+  composer:
+    _title: "Writing a post"
+    send: "Send post"
+    discard: "Discard post"
+    closed_select: "Focus composer"
+    title: "Focus title-field"
+    preview: "Show preview-tab"
+    previewSend: "Show preview-tab or send post if already shown"
+    writeSend: "Show write-tab or send post if already shown"
+    help: "Show help-tab"
+    write: "Show write-tab"
+    bold: "Make selected text bold"
+    italic: "Make selected text italic"
+    list: "Make selected text a list-item"
+    link: "Make selected text a link-name"
+  dialog:
+    _title: "Active dialog (bootbox)"
+    confirm: "Confirm active dialog"
+    close: "Close active dialog"
+  taskbar:
+    _title: "Using the taskbar"
+    closeAll: "Close all tasks"
+    clickFirst: "Toggle first task"
+    clickLast: "Toggle last task"
+
 stringify = (val) ->
   if val instanceof Object then JSON.stringify(val) else val
 
