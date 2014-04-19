@@ -1,8 +1,8 @@
 (->
   debug = false
-  _dbg = ->
-    console.log "Shortcuts DEBUG -", arguments...
-  dbg = -> _dbg arguments... if debug
+  _dbg = (args...) ->
+    console.log "Shortcuts DEBUG -", args...
+  dbg = (args...) -> _dbg args... if debug
   dbg "Debug-mode is set."
 
   inputNames = ['TEXTAREA', 'INPUT']

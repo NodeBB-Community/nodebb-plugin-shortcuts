@@ -1,3 +1,6 @@
+pkg = require './package.json'
+plg = require './plugin.json'
+
 ModulesSockets = module.parent.require './socket.io/modules'
 Configuration = require './services/Configuration'
 Route = require './services/Route'
@@ -6,15 +9,13 @@ debug = false
 forceUpdate = false
 reset = false
 
-plugin =
-  name: 'shortcuts'
-  version: '0.0.1-7'
+plugin = Object.freeze
+  name: plg.id.substring 14
+  version: pkg.version
   adminPage:
-    name: 'Shortcuts'
+    name: plg.name
     icon: 'fa-keyboard-o'
-
-plugin.id = "nodebb-plugin-#{plugin.name}"
-plugin.adminPage.route = "/plugins/#{plugin.name}"
+    route: "/plugins/#{plg.id.substring 14}"
 
 defConfig =
   select_chars: 'werasdfguiohjklnm'

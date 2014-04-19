@@ -1,8 +1,8 @@
-#module.exports.adminBuild = Route.addPlugin plugin
+#module.exports.addAdminNavigation = Route.addAdminNavigations plugin
 
-module.exports.appLoad = (app, middleware, ignored) ->
+module.exports.init = (app, middleware, ignored) ->
 #  Route.templateAdmin app, middleware, plugin.adminPage.route
   initSockets()
 
-module.exports.configDefaults = (id) ->
-  cfg.setOnEmpty() if id == plugin.id
+module.exports.pluginActivation = (id) ->
+  cfg.setOnEmpty() if id == plg.id

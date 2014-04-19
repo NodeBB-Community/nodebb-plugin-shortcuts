@@ -3,7 +3,7 @@
 ## Features
 
  + Adds multiple shortcuts to NodeBB like navigation, quick access to composer-features, etc.
-
+ + Contains Help-message on `?` press
 
 ## Installation
 

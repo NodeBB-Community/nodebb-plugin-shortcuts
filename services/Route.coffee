@@ -5,8 +5,7 @@ module.exports =
   template: (app, middleware, route, obj = {}, template = route.substring 1) ->
     this.get app, middleware.admin.buildHeader, route, (req, res, ignored) ->
       res.render template, obj
-  addPlugins: ->
-    plugins = arguments
+  addAdminNavigations: (plugins...) ->
     (header, cb) ->
       for plugin in plugins
         header.plugins.push
@@ -14,8 +13,6 @@ module.exports =
           icon: plugin.adminPage.icon
           route: plugin.adminPage.route
       cb null, header
-  addPlugin: ->
-    this.addPlugins arguments...
   get: (app, middleware, url, cb, cbApi = cb) ->
     app.get url, middleware, cb
     app.get "/api#{url}", cbApi if cbApi?
