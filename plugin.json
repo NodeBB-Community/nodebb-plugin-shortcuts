@@ -6,7 +6,8 @@
   "library": "./index.js",
   "scripts": [
     "./client-scripts/shortcuts.js",
-    "./client-scripts/shortcuts_main.js"
+    "./client-scripts/shortcuts_main.js",
+    "./client-scripts/shortcuts_selection.js"
   ],
   "templates": "./templates",
   "less": [

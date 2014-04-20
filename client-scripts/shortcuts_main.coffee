@@ -80,7 +80,7 @@
         if nP.css('float') == 'right' then navPills.next nP else navPills.prev nP
     breadcrumb:
       up: ->
-        bc = $('.breadcrumb>li:nth-last-child(2)>a')[0]
+        bc = $('> a', $('.breadcrumb li.active').prev())[0]
         return false if !bc?
         bc.click()
     category:
@@ -90,7 +90,7 @@
         btn.click()
     topic:
       reply: ->
-        btn = $('.post_reply').last()[0]
+        btn = $('.shortcut-selection .btn.quote')[0] || $('.post_reply').last()[0]
         return false if !btn?
         btn.click()
       threadTools: ->

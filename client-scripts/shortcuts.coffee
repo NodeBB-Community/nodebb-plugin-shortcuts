@@ -19,6 +19,7 @@
         when 9 then 'Tab'
         when 13 then 'Enter'
         when 27 then 'Escape'
+        when 32 then 'Space'
         when 37 then 'Left'
         when 38 then 'Up'
         when 39 then 'Right'
@@ -50,16 +51,16 @@
       for k,i in parts when i != parts.length - 1
         this.keyString += switch k.toUpperCase()
           when 'C'
-            ctrl = true;
+            ctrl = true
             'Ctrl+'
           when 'A'
-            alt = true;
+            alt = true
             'Alt+'
           when 'S'
-            shift = true;
+            shift = true
             'Shift+'
           when 'M'
-            meta = true;
+            meta = true
             'Meta+'
           else
             ''
@@ -114,17 +115,42 @@
         str += "#{kA.action}, " for kA in matchingBindings
         dbg "#{str[..str.length - 3]}] match" + (if matchingBindings.length == 1 then "es" else '') + ' the key-event'
       for kA in matchingBindings
-        if this.actions[kA.action]?.cb?.call(e.target, this, e) != false
-          dbg "'#{kA.action}' got triggered"
-          return;
+        return if this.trigger(kA.action, e) != false
       dbg 'No action got triggered'
+    trigger: (actionName, e) ->
+      cb = this.actions[actionName]?.cb
+      if cb? && typeof cb == 'function'
+        res = cb?.call e?.target, this, e
+        dbg "'#{actionName}' got triggered" if res != false
+        res
+      else
+        false
+    addAction: (name, cb) ->
+      this.actions[name] =
+        cb: cb
+        bindings: b for b in this.bindings when b.action == name
     addActions: (obj) ->
       for k, v of obj
-        for name, action of v
+        for name, cb of v
           actionName = "#{k}_#{name}"
-          this.actions[actionName] =
-            cb: action
-            bindings: b for b in this.bindings when b.action == actionName
+          this.addAction actionName, cb
+    wrapAction: (actionName, cb) ->
+      if this.actions[actionName]?
+        this.actions[actionName].cb = cb this.actions[actionName].cb
+      else
+        this.addAction actionName, cb ->
+    prependToAction: (actionName, callback) ->
+      this.wrapAction actionName, (cb) ->
+        (args...) ->
+          res = callback args...
+          return false if res == false
+          cb args...
+    appendToAction: (actionName, callback, force) ->
+      this.wrapAction actionName, (cb) ->
+        (args...) ->
+          res = cb args...
+          return false if res == false && !force
+          callback args...
     help: ->
       if document.querySelector '#shortcuts_help_body'
         $('.bootbox-close-button', d).click() for d in getActiveDialogs()
@@ -175,6 +201,21 @@
       if err?
         console.error err
         return;
+      $('head').append """
+        <style type='text/css'>
+          .shortcut-selection {
+            box-shadow: 0 0 5px 1px #{data.selectionColor} !important;
+          }
+          .shortcut-selection.highlight-in {
+            transition: box-shadow 0.3s;
+            box-shadow: 0 0 10px 6px red !important;
+          }
+          .shortcut-selection.highlight-out {
+            transition: box-shadow 0.2s;
+            box-shadow: 0 0 5px 1px red !important;
+          }
+        </style>
+        """
       shortcuts.parseCfg data
       $(document).keydown (event) ->
         event = event || window.event

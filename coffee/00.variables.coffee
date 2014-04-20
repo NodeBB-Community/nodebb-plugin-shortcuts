@@ -19,6 +19,7 @@ plugin = Object.freeze
 
 defConfig =
   select_chars: 'werasdfguiohjklnm'
+  selectionColor: 'blue'
   actions:
     dialog:
       confirm: ['89', '79', '90'] # y, o, z
@@ -49,15 +50,15 @@ defConfig =
       threadTools: ['A-84'] # A-t
     category:
       newTopic: ['A-89', 'A-S-78', 'A-13'] # A-y, A-S-n, A-Enter
-#    selection:
-#      follow: ['13', '32'] # Enter, Space
-#      highlight: ['S-72'] # h
-#      area:
-#        next: ['S-74'] # S-j
-#        prev: ['S-75'] # S-k
-#      item:
-#        next: ['74'] # j
-#        prev: ['75'] # k
+    selection:
+      follow: ['13', '32'] # Enter, Space
+      highlight: ['S-72'] # S-h
+      area:
+        next: ['S-74'] # S-j
+        prev: ['S-75'] # S-k
+      item:
+        next: ['74'] # j
+        prev: ['75'] # k
     navPills:
       next: ['76'] # l
       prev: ['72'] # h
@@ -105,6 +106,14 @@ descriptions =
   breadcrumb:
     _title: "Navigate upwards (breadcrumb)"
     up: "Navigate upwards (topic -> category -> home)"
+  selection:
+    _title: "Navigate downwards (selection)"
+    follow: "Go into the current selected item"
+    area_next: "Select next item-cluster"
+    area_prev: "Select previous item-cluster"
+    item_next: "Select next item within cluster"
+    item_prev: "Select previous item within cluster"
+    highlight: "Highlight the selected item"
   category:
     _title: "Actions within a Category"
     newTopic: "Create a new Topic"
