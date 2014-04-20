@@ -15,7 +15,7 @@
   getAvailableAreas = ->
     areas = []
     items = []
-    $('[data-cid],[data-tid],[data-pid],#recent_topics').each (ignored, el) ->
+    $('[data-cid]:visible,[data-tid]:visible,[data-pid]:visible,#recent_topics:visible').each (ignored, el) ->
       return if items.indexOf(el) >= 0
       el = $ el
       return if el.is '#post-container'
