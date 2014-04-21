@@ -1,9 +1,10 @@
 (->
   debug = false
+
   _dbg = (args...) ->
     console.log "Shortcuts DEBUG -", args...
   dbg = (args...) -> _dbg args... if debug
-  dbg "Debug-mode is set."
+  dbg "Debug-mode is enabled."
 
   inputNames = ['TEXTAREA', 'INPUT']
 
@@ -13,28 +14,27 @@
       String.fromCharCode(code).toUpperCase()
     else if code >= 112 && code <= 123
       "F#{code - 111}"
-    else
-      switch code
-        when 8 then 'Backspace'
-        when 9 then 'Tab'
-        when 13 then 'Enter'
-        when 27 then 'Escape'
-        when 32 then 'Space'
-        when 37 then 'Left'
-        when 38 then 'Up'
-        when 39 then 'Right'
-        when 40 then 'Down'
-        when 45 then 'Insert'
-        when 46 then 'Delete'
-        when 187 then '='
-        when 189 then '-'
-        when 190 then '.'
-        when 191 then '/'
-        when 219 then '['
-        when 220 then '\\'
-        when 221 then ']'
-        else
-          "##{code}"
+    else switch code
+      when 8 then 'Backspace'
+      when 9 then 'Tab'
+      when 13 then 'Enter'
+      when 27 then 'Escape'
+      when 32 then 'Space'
+      when 37 then 'Left'
+      when 38 then 'Up'
+      when 39 then 'Right'
+      when 40 then 'Down'
+      when 45 then 'Insert'
+      when 46 then 'Delete'
+      when 187 then '='
+      when 189 then '-'
+      when 190 then '.'
+      when 191 then '/'
+      when 219 then '['
+      when 220 then '\\'
+      when 221 then ']'
+      else
+        "##{code}"
 
   class KeyAction
     keyCode: false
@@ -207,21 +207,8 @@
       if err?
         console.error err
         return;
-      $('head').append """
-        <style type='text/css'>
-          .shortcut-selection {
-            box-shadow: 0 0 5px 1px #{data.selectionColor} !important;
-          }
-          .shortcut-selection.highlight-in {
-            transition: box-shadow 0.3s;
-            box-shadow: 0 0 10px 6px red !important;
-          }
-          .shortcut-selection.highlight-out {
-            transition: box-shadow 0.2s;
-            box-shadow: 0 0 5px 1px red !important;
-          }
-        </style>
-        """
+      c = data.selectionColor
+      $('head').append "<style type='text/css'>.shortcut-selection { box-shadow:0 0 5px 1px #{c} !important; }</style>"
       shortcuts.parseCfg data
       $(document).keydown (event) ->
         event = event || window.event

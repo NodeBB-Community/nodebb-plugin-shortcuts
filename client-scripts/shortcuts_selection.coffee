@@ -33,6 +33,7 @@
       if item.scrollIntoViewIfNeeded? then item.scrollIntoViewIfNeeded() else item.scrollIntoView true
       maxTop = $(item).position().top - $('#header-menu').height() - 10
       document.body.scrollTop = maxTop if document.body.scrollTop > maxTop
+      document.documentElement.scrollTop = maxTop if document.documentElement.scrollTop > maxTop
 
   selectItem = (index) ->
     selection.classified.removeClass 'shortcut-selection'

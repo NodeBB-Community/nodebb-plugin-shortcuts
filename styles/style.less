@@ -33,3 +33,15 @@
     }
   }
 }
+
+.shortcut-selection {
+  position: relative;
+  &.highlight-in {
+    transition: box-shadow 0.3s;
+    box-shadow: 0 0 10px 6px red !important;
+  }
+  &.highlight-out {
+    transition: box-shadow 0.2s;
+    box-shadow: 0 0 5px 1px red !important;
+  }
+}

@@ -36,6 +36,7 @@
     else
       el = document.body
       h = window.innerHeight - $('.header').height()
+      document.documentElement.scrollTop += h * factor
     el.scrollTop += h * factor
 
   scrollYTo = (percentage) ->
@@ -46,6 +47,7 @@
     else
       el = document.body
       h = percentage * (document.body.offsetHeight - window.innerHeight)
+      document.documentElement.scrollTop = h
     el.scrollTop = h
 
   shortcuts.addActions
