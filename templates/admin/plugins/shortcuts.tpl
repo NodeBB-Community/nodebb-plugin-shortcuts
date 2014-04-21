@@ -4,7 +4,7 @@
 <form>
   <div class="alert alert-info">
     <p>
-      Will come soon... Be patient ;)
+      Color of selection-shadow: <input data-key="selectionColor" type="color" /><br>
     </p>
   </div>
 </form>
@@ -12,7 +12,7 @@
 <button class="btn btn-lg btn-primary" id="save">Save</button>
 
 <script>
-  require(['forum/admin/settings'], function(Settings) {
-    Settings.prepare();
+  require(['../../plugins/nodebb-plugin-shortcuts/services/AdminSettings'], function(AdminSettings) {
+    AdminSettings.init('shortcuts');
   });
 </script>

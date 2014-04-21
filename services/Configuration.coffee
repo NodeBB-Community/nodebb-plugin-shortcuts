@@ -46,16 +46,16 @@ class Configuration
   cfg: {}
   version: '0.0.0'
   debug: false
-  constructor: (data, defCfg, debug = false, forceUpdate = false, reset = false) ->
+  constructor: (data, defCfg, debug = false, forceUpdate = false, reset = false, cb = null) ->
     this.id = data.name
     this.version = data.version || this.version
     this.defCfg = defCfg
     this.debug = debug
     if reset
-      this.reset()
+      this.reset cb
     else
       this.sync()
-      this.checkStructure forceUpdate
+      this.checkStructure forceUpdate, cb
   _log: (args...) ->
     console.log "Configuration (#{this.id}):", args... if this.debug
   _list: (cb) ->
@@ -102,20 +102,22 @@ class Configuration
         obj[k] = {} if !obj.hasOwnProperty k
         obj = obj[k]
       obj[parts[parts.length - 1]] = val
-  reset: ->
+  reset: (cb) ->
     this._log 'Reset initiated.'
     this.cleanUp ->
       this.set this.defCfg
       this.persist ->
         this.dbg()
+        cb() if cb?
   cleanUp: (cb) ->
     this._list (ignored, obj) ->
       regexp = new RegExp "(^|:)#{this.id}(:|$)"
       meta.configs.remove key for key of obj when regexp.test key # TODO why isn't there a callback param for remove?
       cb.call this
-  checkStructure: (force) ->
+  checkStructure: (force, cb) ->
     if !force && this.cfg.version == this.version
       this.dbg()
+      cb() if cb?
     else
       this._log 'Structure-update initiated.'
       this._list ->
@@ -123,5 +125,6 @@ class Configuration
         this.cfg.version = this.version
         this.persist ->
           this.dbg()
+          cb() if cb?
 
 module.exports = Configuration

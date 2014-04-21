@@ -2,6 +2,7 @@ pkg = require './package.json'
 plg = require './plugin.json'
 
 ModulesSockets = module.parent.require './socket.io/modules'
+io = module.parent.require './socket.io'
 Configuration = require './services/Configuration'
 Route = require './services/Route'
 
