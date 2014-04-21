@@ -41,11 +41,11 @@
   scrollYTo = (percentage) ->
     el = $('#shortcuts_help_body')
     if el.length
-      h = percentage * ($('> div', el).height() - el.height())
+      h = percentage * ($('> div', el)[0].offsetHeight - el.height())
       el = el[0]
     else
       el = document.body
-      h = percentage * ($('body').height() - window.innerHeight)
+      h = percentage * (document.body.offsetHeight - window.innerHeight)
     el.scrollTop = h
 
   shortcuts.addActions

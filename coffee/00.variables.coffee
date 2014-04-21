@@ -19,7 +19,7 @@ plugin = Object.freeze
 
 defConfig =
   select_chars: 'werasdfguiohjklnm'
-  selectionColor: 'green'
+  selectionColor: '#0059B2'
   actions:
     dialog:
       confirm: ['89', '79', '90'] # y, o, z
