@@ -13,6 +13,6 @@
 
 <script>
   require(['../../plugins/nodebb-plugin-shortcuts/services/AdminSettings'], function(AdminSettings) {
-    AdminSettings.init('shortcuts');
+    AdminSettings.init();
   });
 </script>

@@ -157,9 +157,7 @@
       if document.querySelector '#shortcuts_help_body'
         $('.bootbox-close-button', d).click() for d in getActiveDialogs()
         return;
-      height = window.innerHeight - 150
-      height = 100 if !height || height < 100
-      msg = "<div id='shortcuts_help_body' style='height:#{height}px'><div>"
+      msg = "<div id='shortcuts_help_body'>"
       for scope, obj of this.helpMessages
         msg += "<h4>#{obj._title}</h4><ul>"
         for name, description of obj when name != '_title'
@@ -168,10 +166,13 @@
             keys = keys.join ' | '
             msg += "<li class='clearfix'><div class='description'>#{description}</div><div class='keys'>#{keys}</div></li>"
         msg += "</ul>"
-      msg += "</ul></div></div>"
+      msg += "</ul></div>"
       bootbox.dialog
         title: "NodeBB Shortcuts <small>#{this.version}</small>"
         message: msg
+      setTimeout ->
+        $('#shortcuts_help_body>div').focus()
+      , 100
 
   getActiveComposer = ->
     c = $('.composer').filter(':visible')

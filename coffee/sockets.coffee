@@ -4,7 +4,7 @@ initSockets = ->
     config.descriptions = descriptions
     cb null, config
 
-  ModulesSockets.settingsSet = (socket, data, cb) ->
+  ModulesSockets.shortcutsAdminSettings = (socket, data, cb) ->
     try
       new Configuration
         name: data.id

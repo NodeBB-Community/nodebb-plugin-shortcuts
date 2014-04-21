@@ -1,5 +1,5 @@
 define ->
-  id = ''
+  id = 'shortcuts'
   version = ''
   cfg = {}
   fields = $()
@@ -31,8 +31,7 @@ define ->
   Settings =
     get: ->
       cfg
-    init: (name) ->
-      id = name if name?
+    init: ->
       if !app.config?
         setTimeout Settings.init, 125
         return;
@@ -53,7 +52,7 @@ define ->
         field = $ field
         value = if field.is 'input' && field.attr('type') == 'checkbox' then field.prop 'checked' else field.val()
         setValue field.data('key'), value
-      socket.emit 'modules.settingsSet',
+      socket.emit 'modules.shortcutsAdminSettings',
         id: id
         settings: cfg
         version: version

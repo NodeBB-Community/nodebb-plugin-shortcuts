@@ -10,9 +10,7 @@
       return comp if $(comp).css('visibility') != 'hidden'
     null
   getActiveDialogs = ->
-    dialogs = []
-    $('.modal-dialog').each (i, d) -> dialogs.push d if $(d).height()
-    dialogs
+    $('.modal-dialog').filter(':visible')
   blurFocus = ->
     $('*:focus').blur()
 
@@ -29,7 +27,7 @@
         isNext = $(pill).hasClass 'active'
 
   scrollPage = (factor) ->
-    el = $('#shortcuts_help_body')
+    el = getActiveDialogs().parent()
     if el.length
       h = el.parent().height()
       el = el[0]
@@ -40,9 +38,9 @@
     el.scrollTop += h * factor
 
   scrollYTo = (percentage) ->
-    el = $('#shortcuts_help_body')
+    el = getActiveDialogs().parent()
     if el.length
-      h = percentage * ($('> div', el)[0].offsetHeight - el.height())
+      h = percentage * (el.children()[0].offsetHeight - el.height())
       el = el[0]
     else
       el = document.body
@@ -155,9 +153,11 @@
         $('.formatting-bar .fa-link', getActiveComposer())[0].click()
     dialog:
       confirm: ->
-        $('.modal-footer>button', d)[1]?.click() for d in getActiveDialogs()
+        getActiveDialogs().each (ignored, d) ->
+          $('.modal-footer>button', d)[1]?.click()
       close: ->
-        $('.bootbox-close-button', d).click() for d in getActiveDialogs()
+        getActiveDialogs().each (ignored, d) ->
+          $('.bootbox-close-button', d).click()
     taskbar:
       closeAll: ->
         item.click() for item in $('.taskbar li.active>a').toArray()
