@@ -19,7 +19,7 @@ plugin = Object.freeze
 
 defConfig =
   select_chars: 'werasdfguiohjklnm'
-  selectionColor: 'blue'
+  selectionColor: 'green'
   actions:
     dialog:
       confirm: ['89', '79', '90'] # y, o, z
@@ -27,7 +27,6 @@ defConfig =
     composer:
       send: ['A-83'] # A-s
       discard: ['A-68', 'S-27'] # A-d, S-Esc
-      title: ['A-S-84'] # A-S-t
       preview: ['A-80'] # A-p
       previewSend: ['C-13'] # C-Enter
       writeSend: ['C-S-13'] # C-S-Enter
@@ -38,7 +37,8 @@ defConfig =
       list: ['A-76'] # A-l
       link: ['A-85'] # A-u
       closed:
-        select: ['73', 'C-73', 'A-S-73'] # i, C-i, A-S-i
+        title: ['A-S-84'] # A-S-t
+        input: ['73', 'C-73', 'A-S-73'] # i, C-i, A-S-i
     taskbar:
       closeAll: ['A-67', 'A-88'] # A-c, A-x
       clickFirst: ['A-86'] # A-v
@@ -125,8 +125,8 @@ descriptions =
     _title: "Writing a post"
     send: "Send post"
     discard: "Discard post"
-    closed_select: "Focus composer"
-    title: "Focus title-field"
+    closed_input: "Focus textarea (opens closed composer)"
+    closed_title: "Focus title-field (opens closed composer)"
     preview: "Show preview-tab"
     previewSend: "Show preview-tab or send post if already shown"
     writeSend: "Show write-tab or send post if already shown"

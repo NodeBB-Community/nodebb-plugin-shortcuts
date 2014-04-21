@@ -1,7 +1,13 @@
 (->
+  toggleFirstComposer = ->
+    tb = $('.taskbar li[data-module="composer"]')
+    id = 'cmp-uuid-' + tb.data 'uuid'
+    $('> a', tb)[0]?.click()
+    document.getElementById id
   getActiveComposer = ->
-    for c in document.querySelectorAll '.composer'
-      return c if $(c).css('visibility') == 'visible'
+    c = $('.composer')
+    for comp in c.toArray()
+      return comp if $(comp).css('visibility') != 'hidden'
     null
   getActiveDialogs = ->
     dialogs = []
@@ -102,19 +108,18 @@
         $('button[data-action="post"]', getActiveComposer())[0].click()
       discard: ->
         $('button[data-action="discard"]', getActiveComposer())[0].click()
-      closed_select: (ignored, e) ->
-        c = getActiveComposer()
-        if !c?
-          $('.taskbar li[data-module="composer"]>a')[0]?.click()
-          c = getActiveComposer()
-        if !c?
-          e.preventDefault()
-          return false
-        $('.write', c).focus()
-        e.preventDefault()
-      title: (ignored, e) ->
-        $('.title', getActiveComposer()).focus()
-        e.preventDefault()
+      closed_input: ->
+        c = getActiveComposer() || toggleFirstComposer()
+        return false if !c?
+        setTimeout ->
+          $('.write', c).focus()
+        , 0
+      closed_title: ->
+        c = getActiveComposer() || toggleFirstComposer()
+        return false if !c?
+        setTimeout ->
+          $('.title', c).focus()
+        , 0
       preview: ->
         p = $ 'a[data-pane=".tab-preview"]', getActiveComposer()
         return false if p.parent().hasClass 'active'

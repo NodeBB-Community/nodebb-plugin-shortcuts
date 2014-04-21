@@ -121,7 +121,9 @@
       cb = this.actions[actionName]?.cb
       if cb? && typeof cb == 'function'
         res = cb?.call e?.target, this, e
-        dbg "'#{actionName}' got triggered" if res != false
+        if res != false
+          e?.preventDefault()
+          dbg "'#{actionName}' got triggered"
         res
       else
         false
@@ -172,8 +174,9 @@
         message: msg
 
   getActiveComposer = ->
-    for c in document.querySelectorAll '.composer'
-      return c if $(c).css('visibility') == 'visible'
+    c = $('.composer').filter(':visible')
+    for comp in c.toArray()
+      return comp if $(comp).css('visibility') != 'hidden'
     null
 
   getActiveDialogs = ->
@@ -186,12 +189,15 @@
     # dialog, composer, taskbar, breadcrumb, selection, navPills, scroll, header, topic, category
     scopes = []
     return ['dialog', 'body'] if getActiveDialogs().length
-    if getActiveComposer()
+    if getActiveComposer()?
       scopes.push 'composer'
     else if $('.taskbar li[data-module="composer"]').length
       scopes.push 'composer_closed'
     scopes.push 'taskbar' if $('.taskbar li').length
-    scopes.push 'breadcrumb', 'topic', 'category', 'selection', 'navPills', 'header', 'body'
+    scopes.push 'breadcrumb' if $('.breadcrumb').length
+    scopes.push 'topic', 'category', 'selection'
+    scopes.push 'navPills' if $('.nav-pills').length
+    scopes.push 'header', 'body'
     scopes
 
   window.shortcuts = new Shortcuts()

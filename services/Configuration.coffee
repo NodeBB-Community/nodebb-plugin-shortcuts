@@ -17,26 +17,51 @@ parse = (val, defVal) ->
 merge = (obj1, obj2) ->
   for key, val2 of obj2
     val1 = obj1[key]
-    if !obj1.hasOwnProperty(key)
+    if !obj1.hasOwnProperty key
+      obj1[key] = val2
+    else if typeof val2 != typeof val1
       obj1[key] = val2
     else if typeof val2 == 'object'
-      if typeof val1 == 'object'
-        merge val1, val2
-      else
-        obj1[key] = val2
+      merge val1, val2
+  obj1
+
+trim = (obj1, obj2) ->
+  for key, val1 of obj1
+    if !obj2.hasOwnProperty key
+      delete obj1[key]
+    else if typeof val1 == 'object'
+      trim val1, obj2[key]
+  obj1
+
+mergeSettings = (cfg, defCfg) ->
+  if typeof cfg.settings != typeof defCfg || typeof defCfg != 'object'
+    cfg.settings = defCfg
+  else
+    merge cfg.settings, defCfg
+    trim cfg.settings, defCfg
 
 class Configuration
   id: ''
   defCfg: {}
+  cfg: {}
+  version: '0.0.0'
   debug: false
   constructor: (data, defCfg, debug = false, forceUpdate = false, reset = false) ->
-    defCfg._version = data.version
     this.id = data.name
+    this.version = data.version || this.version
     this.defCfg = defCfg
     this.debug = debug
-    if reset then this.reset() else this.checkStructure forceUpdate
-  _log: ->
-    console.log "Configuration (#{this.id}):", arguments... if this.debug
+    if reset
+      this.reset()
+    else
+      this.sync()
+      this.checkStructure forceUpdate
+  _log: (args...) ->
+    console.log "Configuration (#{this.id}):", args... if this.debug
+  _list: (cb) ->
+    _this = this
+    meta.configs.list (args...) ->
+      cb.apply _this, args
   dbg: (delay = 0) ->
     return if !this.debug
     if delay
@@ -46,39 +71,57 @@ class Configuration
       , delay
     else
       this._log this.get()
-  get: (key = null, def = null) ->
-    if !key
-      obj = {}
-      obj[k] = this.get k, v for k, v of this.defCfg
-      return obj
-    if !def?
-      def = this.defCfg[key]
-    val = meta.config["#{this.id}:#{key}"]
-    if val then parse val, def else def
-  set: (key, val, cb) ->
-    meta.configs.set "#{this.id}:#{key}", stringify(val), cb
-  setOnEmpty: ->
-    for key, val of this.defCfg
-      meta.configs.setOnEmpty "#{this.id}:#{key}", stringify val
+  sync: ->
+    (this.cfg = JSON.parse(meta.config["settings:#{this.id}"] || "{}")).settings
+  persist: (cb) ->
+    _this = this
+    meta.configs.set "settings:#{this.id}", JSON.stringify(this.cfg), (args...) ->
+      cb.apply _this, args
+  persistOnEmpty: (cb) ->
+    _this = this
+    meta.configs.setOnEmpty "settings:#{this.id}", JSON.stringify(this.cfg), (args...) ->
+      cb.apply _this, args
+  get: (key = '', def = null) ->
+    obj = this.cfg.settings
+    parts = key.split '.'
+    obj = obj[k] for k in parts when k && obj?
+    if !obj?
+      if !def
+        def = this.defCfg
+        def = def[k] for k in parts when k && def?
+      return def
+    obj
+  set: (key, val) ->
+    this.cfg.version = this.version
+    if !val? || !key
+      this.cfg.settings = val || key
+    else
+      obj = this.cfg.settings
+      parts = key.split '.'
+      for k in parts[0..parts.length - 2] when k
+        obj[k] = {} if !obj.hasOwnProperty k
+        obj = obj[k]
+      obj[parts[parts.length - 1]] = val
   reset: ->
     this._log 'Reset initiated.'
-    _this = this
-    meta.configs.list (ignored, obj) ->
-      meta.configs.remove key for key of obj when key.search("#{_this.id}:") == 0
-      _this.set key, val for key, val of _this.defCfg
-      _this.dbg 100
+    this.cleanUp ->
+      this.set this.defCfg
+      this.persist ->
+        this.dbg()
+  cleanUp: (cb) ->
+    this._list (ignored, obj) ->
+      regexp = new RegExp "(^|:)#{this.id}(:|$)"
+      meta.configs.remove key for key of obj when regexp.test key # TODO why isn't there a callback param for remove?
+      cb.call this
   checkStructure: (force) ->
-    if !force && this.get('_version', '0.0.0') == this.defCfg._version
+    if !force && this.cfg.version == this.version
       this.dbg()
     else
       this._log 'Structure-update initiated.'
-      _this = this
-      meta.configs.list (ignored, obj) ->
-        conf = _this.get()
-        merge conf, _this.defCfg
-        conf._version = _this.defCfg._version
-        meta.configs.remove key for key of obj when key.search("#{_this.id}:") == 0
-        _this.set key, conf[key] for key of _this.defCfg
-        _this.dbg 100
+      this._list ->
+        mergeSettings this.cfg, this.defCfg
+        this.cfg.version = this.version
+        this.persist ->
+          this.dbg()
 
 module.exports = Configuration

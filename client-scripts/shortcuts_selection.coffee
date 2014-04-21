@@ -109,11 +109,11 @@
         setTimeout ->
           item.removeClass 'highlight-out'
         , 700
-      item_next: (s) ->
-        return s.trigger 'selection_area_next' if !selection.items.length
+      item_next: (s, e) ->
+        return s.trigger 'selection_area_next', e if !selection.items.length
         selectNextItem 1
-      item_prev: (s) ->
-        s.trigger 'selection_area_next' if !selection.items.length
+      item_prev: (s, e) ->
+        s.trigger 'selection_area_next', e if !selection.items.length
         selectNextItem -1
       area_next: ->
         findNextArea getAvailableAreas()

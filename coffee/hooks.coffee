@@ -5,4 +5,4 @@ module.exports.init = (app, middleware, ignored) ->
   initSockets()
 
 module.exports.pluginActivation = (id) ->
-  cfg.setOnEmpty() if id == plg.id
+  cfg.persistOnEmpty() if id == plg.id
