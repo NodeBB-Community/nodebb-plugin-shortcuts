@@ -20,6 +20,7 @@ plugin = Object.freeze
 
 defConfig =
   select_chars: 'werasdfguiohjklnm'
+  timeSpace: 200
   selectionColor: '#0059B2'
   actions:
     dialog:

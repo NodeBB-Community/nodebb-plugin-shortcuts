@@ -5,6 +5,7 @@
   <div class="alert alert-info">
     <p>
       Color of selection-shadow: <input data-key="selectionColor" type="color" /><br>
+      Delay between repeating action while key hold down: <input data-key="timeSpace" type="number" step="50" />
     </p>
   </div>
 </form>

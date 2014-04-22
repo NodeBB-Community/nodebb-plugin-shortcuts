@@ -88,9 +88,14 @@
     bindings: []
     actions: {}
     helpMessages: {}
+    lastTriggered:
+      action: null
+      time: 0
+      timeSpace: 200
     parseCfg: (cfg) ->
       this.version = cfg.version
       this.helpMessages = cfg.descriptions
+      this.lastTriggered.timeSpace = cfg.timeSpace
       parseBindings this.bindings = [], this.actions, cfg.actions, ''
     passEvent: (e, key) ->
       scopes = getActionScopes()
@@ -114,8 +119,14 @@
         str = '['
         str += "#{kA.action}, " for kA in matchingBindings
         dbg "#{str[..str.length - 3]}] match" + (if matchingBindings.length == 1 then "es" else '') + ' the key-event'
+      now = new Date().getTime()
+      shortTime = now - this.lastTriggered.time <= this.lastTriggered.timeSpace
       for kA in matchingBindings
-        return if this.trigger(kA.action, e) != false
+        break if shortTime && kA == this.lastTriggered.action
+        if this.trigger(kA.action, e) != false
+          this.lastTriggered.action = kA
+          this.lastTriggered.time = now
+          return;
       dbg 'No action got triggered'
     trigger: (actionName, e) ->
       cb = this.actions[actionName]?.cb
@@ -123,6 +134,7 @@
         res = cb?.call e?.target, this, e
         if res != false
           e?.preventDefault()
+          e?.stopPropagation()
           dbg "'#{actionName}' got triggered"
         res
       else
@@ -213,7 +225,7 @@
       shortcuts.parseCfg data
       $(document).keydown (event) ->
         event = event || window.event
-        key = event.which || event.keyCode || event.key
+        key = event.which = event.which || event.keyCode || event.key
         _dbg "Key Down: " + (if event.ctrlKey then 'C-' else '') + (if event.altKey then 'A-' else '') +
           (if event.shiftKey then 'S-' else '') + (if event.metaKey then 'M-' else '') + key if debug
         shortcuts.passEvent event, key
@@ -222,5 +234,7 @@
         return if inputNames.indexOf(event.target.tagName) >= 0
         key = event.which || event.keyCode || event.key
         shortcuts.help() if key == 63
+      $(document).keyup ->
+        shortcuts.lastTriggered.time = 0
 #
 )()
