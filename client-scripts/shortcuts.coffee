@@ -1,8 +1,7 @@
 (->
   debug = false
 
-  _dbg = (args...) ->
-    console.log "Shortcuts DEBUG -", args...
+  _dbg = (args...) -> console.log "Shortcuts DEBUG -", args...
   dbg = (args...) -> _dbg args... if debug
   dbg "Debug-mode is enabled."
 
@@ -15,26 +14,26 @@
     else if code >= 112 && code <= 123
       "F#{code - 111}"
     else switch code
-      when 8 then 'Backspace'
-      when 9 then 'Tab'
-      when 13 then 'Enter'
-      when 27 then 'Escape'
-      when 32 then 'Space'
-      when 37 then 'Left'
-      when 38 then 'Up'
-      when 39 then 'Right'
-      when 40 then 'Down'
-      when 45 then 'Insert'
-      when 46 then 'Delete'
-      when 187 then '='
-      when 189 then '-'
-      when 190 then '.'
-      when 191 then '/'
-      when 219 then '['
-      when 220 then '\\'
-      when 221 then ']'
-      else
-        "##{code}"
+        when 8 then 'Backspace'
+        when 9 then 'Tab'
+        when 13 then 'Enter'
+        when 27 then 'Escape'
+        when 32 then 'Space'
+        when 37 then 'Left'
+        when 38 then 'Up'
+        when 39 then 'Right'
+        when 40 then 'Down'
+        when 45 then 'Insert'
+        when 46 then 'Delete'
+        when 187 then '='
+        when 189 then '-'
+        when 190 then '.'
+        when 191 then '/'
+        when 219 then '['
+        when 220 then '\\'
+        when 221 then ']'
+        else
+          "##{code}"
 
   class KeyAction
     keyCode: false
@@ -234,7 +233,6 @@
         return if inputNames.indexOf(event.target.tagName) >= 0
         key = event.which || event.keyCode || event.key
         shortcuts.help() if key == 63
-      $(document).keyup ->
-        shortcuts.lastTriggered.time = 0
+      $(document).keyup -> shortcuts.lastTriggered.time = 0
 #
 )()

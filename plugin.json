@@ -1,34 +1,34 @@
 {
-  "id": "nodebb-plugin-shortcuts",
-  "name": "Shortcuts",
-  "description": "Adds keyboard-shortcuts to NodeBB",
-  "url": "https://github.com/frissdiegurke/nodebb-plugin-shortcuts",
-  "library": "./index.js",
-  "scripts": [
-    "./client-scripts/shortcuts.js",
-    "./client-scripts/shortcuts_main.js",
-    "./client-scripts/shortcuts_selection.js"
-  ],
-  "templates": "./templates",
-  "less": [
-    "./styles/style.less"
-  ],
-  "staticDirs": {
-    "services": "./services/client-side"
-  },
-  "hooks": [
-    {
-      "hook": "action:plugin.activate",
-      "method": "pluginActivation"
+    "id": "nodebb-plugin-shortcuts",
+    "name": "Shortcuts",
+    "description": "Adds keyboard-shortcuts to NodeBB",
+    "url": "https://github.com/frissdiegurke/nodebb-plugin-shortcuts",
+    "library": "./index.js",
+    "scripts": [
+        "./client-scripts/shortcuts.js",
+        "./client-scripts/shortcuts_main.js",
+        "./client-scripts/shortcuts_selection.js"
+    ],
+    "templates": "./templates",
+    "less": [
+        "./styles/style.less"
+    ],
+    "staticDirs": {
+        "services": "./services/client-side"
     },
-    {
-      "hook": "filter:admin.header.build",
-      "method": "addAdminNavigation"
-    },
-    {
-      "hook": "action:app.load",
-      "method": "init"
-    }
-  ],
-  "minver": "0.4.0"
+    "hooks": [
+        {
+            "hook": "action:plugin.activate",
+            "method": "pluginActivation"
+        },
+        {
+            "hook": "filter:admin.header.build",
+            "method": "addAdminNavigation"
+        },
+        {
+            "hook": "action:app.load",
+            "method": "init"
+        }
+    ],
+    "minver": "0.4.0"
 }

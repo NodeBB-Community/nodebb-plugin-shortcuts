@@ -9,10 +9,8 @@
     for comp in c.toArray()
       return comp if $(comp).css('visibility') != 'hidden'
     null
-  getActiveDialogs = ->
-    $('.modal-dialog').filter(':visible')
-  blurFocus = ->
-    $('*:focus').blur()
+  getActiveDialogs = -> $('.modal-dialog').filter(':visible')
+  blurFocus = -> $('*:focus').blur()
 
   navPills =
     next: (nP) ->
@@ -50,33 +48,20 @@
 
   shortcuts.addActions
     body:
-      focus: ->
-        blurFocus()
-      scroll_pageDown: ->
-        scrollPage 1
-      scroll_pageUp: ->
-        scrollPage -1
-      scroll_top: ->
-        scrollYTo 0
-      scroll_bottom: ->
-        scrollYTo 1
+      focus: -> blurFocus()
+      scroll_pageDown: -> scrollPage 1
+      scroll_pageUp: -> scrollPage -1
+      scroll_top: -> scrollYTo 0
+      scroll_bottom: -> scrollYTo 1
     header:
-      home: ->
-        ajaxify.go ''
-      unread: ->
-        ajaxify.go 'unread'
-      recent: ->
-        ajaxify.go 'recent'
-      popular: ->
-        ajaxify.go 'popular'
-      users: ->
-        ajaxify.go 'users'
-      notifications: ->
-        ajaxify.go 'notifications'
-      profile: ->
-        ajaxify.go "user/#{app.username}"
-      chats: ->
-        $('#chat_dropdown').click()
+      home: -> ajaxify.go ''
+      unread: -> ajaxify.go 'unread'
+      recent: -> ajaxify.go 'recent'
+      popular: -> ajaxify.go 'popular'
+      users: -> ajaxify.go 'users'
+      notifications: -> ajaxify.go 'notifications'
+      profile: -> ajaxify.go "user/#{app.username}"
+      chats: -> $('#chat_dropdown').click()
     navPills:
       next: ->
         nP = $ '>li', $('.nav-pills')[0]
@@ -104,22 +89,16 @@
         return false if !btn?
         btn.click()
     composer:
-      send: ->
-        $('button[data-action="post"]', getActiveComposer())[0].click()
-      discard: ->
-        $('button[data-action="discard"]', getActiveComposer())[0].click()
+      send: -> $('button[data-action="post"]', getActiveComposer())[0].click()
+      discard: -> $('button[data-action="discard"]', getActiveComposer())[0].click()
       closed_input: ->
         c = getActiveComposer() || toggleFirstComposer()
         return false if !c?
-        setTimeout ->
-          $('.write', c).focus()
-        , 0
+        setTimeout (-> $('.write', c).focus()), 0
       closed_title: ->
         c = getActiveComposer() || toggleFirstComposer()
         return false if !c?
-        setTimeout ->
-          $('.title', c).focus()
-        , 0
+        setTimeout (-> $('.title', c).focus()), 0
       preview: ->
         p = $ 'a[data-pane=".tab-preview"]', getActiveComposer()
         return false if p.parent().hasClass 'active'
@@ -143,27 +122,16 @@
           $('.write', c).focus()
           return false
         w[0].click()
-      bold: ->
-        $('.formatting-bar .fa-bold', getActiveComposer())[0].click()
-      italic: ->
-        $('.formatting-bar .fa-italic', getActiveComposer())[0].click()
-      list: ->
-        $('.formatting-bar .fa-list', getActiveComposer())[0].click()
-      link: ->
-        $('.formatting-bar .fa-link', getActiveComposer())[0].click()
+      bold: -> $('.formatting-bar .fa-bold', getActiveComposer())[0].click()
+      italic: -> $('.formatting-bar .fa-italic', getActiveComposer())[0].click()
+      list: -> $('.formatting-bar .fa-list', getActiveComposer())[0].click()
+      link: -> $('.formatting-bar .fa-link', getActiveComposer())[0].click()
     dialog:
-      confirm: ->
-        getActiveDialogs().each (ignored, d) ->
-          $('.modal-footer>button', d)[1]?.click()
-      close: ->
-        getActiveDialogs().each (ignored, d) ->
-          $('.bootbox-close-button', d).click()
+      confirm: -> getActiveDialogs().each (ignored, d) -> $('.modal-footer>button', d)[1]?.click()
+      close: -> getActiveDialogs().each (ignored, d) -> $('.bootbox-close-button', d).click()
     taskbar:
-      closeAll: ->
-        item.click() for item in $('.taskbar li.active>a').toArray()
-      clickFirst: ->
-        $('.taskbar li>a')[0]?.click()
-      clickLast: ->
-        $('.taskbar li>a').last()[0]?.click()
+      closeAll: -> item.click() for item in $('.taskbar li.active>a').toArray()
+      clickFirst: -> $('.taskbar li>a')[0]?.click()
+      clickLast: -> $('.taskbar li>a').last()[0]?.click()
 #
 )()

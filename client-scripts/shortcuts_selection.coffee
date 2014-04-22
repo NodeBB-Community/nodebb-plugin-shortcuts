@@ -1,11 +1,11 @@
 (->
-
   selection =
     areas: []
     items: $()
     index: -1
     classified: $()
-    item: -> this.items[this.index] || null
+    item: ->
+      this.items[this.index] || null
 
   ajaxifyGo = ajaxify.go
   ajaxify.go = (args...) ->
