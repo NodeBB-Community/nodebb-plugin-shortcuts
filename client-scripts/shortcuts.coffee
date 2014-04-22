@@ -7,33 +7,17 @@
 
   inputNames = ['TEXTAREA', 'INPUT']
 
+  keyMap =
+    0: '', 8: 'Backspace', 9: 'Tab', 13: 'Enter', 27: 'Escape', 32: 'Space', 37: 'Left', 38: 'Up', 39: 'Right',
+    40: 'Down', 45: 'Insert', 46: 'Delete', 187: '=', 189: '-', 190: '.', 191: '/', 219: '[', 220: '\\', 221: ']'
+
   convertKeyCodeToChar = (code) ->
     code = +code
     if code >= 48 && code <= 90
       String.fromCharCode(code).toUpperCase()
     else if code >= 112 && code <= 123
       "F#{code - 111}"
-    else switch code
-        when 8 then 'Backspace'
-        when 9 then 'Tab'
-        when 13 then 'Enter'
-        when 27 then 'Escape'
-        when 32 then 'Space'
-        when 37 then 'Left'
-        when 38 then 'Up'
-        when 39 then 'Right'
-        when 40 then 'Down'
-        when 45 then 'Insert'
-        when 46 then 'Delete'
-        when 187 then '='
-        when 189 then '-'
-        when 190 then '.'
-        when 191 then '/'
-        when 219 then '['
-        when 220 then '\\'
-        when 221 then ']'
-        else
-          "##{code}"
+    else keyMap[code] || "##{code}"
 
   class KeyAction
     keyCode: false
@@ -45,8 +29,8 @@
       shift = false
       meta = false
       this.action = actionName
-      parts = keyName.split '-'
-      this.keyCode = +parts[parts.length - 1]
+      parts = keyName.split '+'
+      this.keyCode = +/\d+/.exec(parts[parts.length - 1])[0]
       for k,i in parts when i != parts.length - 1
         this.keyString += switch k.toUpperCase()
           when 'C'

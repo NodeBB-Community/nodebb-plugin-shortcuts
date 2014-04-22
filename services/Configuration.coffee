@@ -77,10 +77,12 @@ class Configuration
     _this = this
     meta.configs.set "settings:#{this.id}", JSON.stringify(this.cfg), (args...) ->
       cb.apply _this, args
+    this
   persistOnEmpty: (cb) ->
     _this = this
     meta.configs.setOnEmpty "settings:#{this.id}", JSON.stringify(this.cfg), (args...) ->
       cb.apply _this, args
+    this
   get: (key = '', def = null) ->
     obj = this.cfg.settings
     parts = key.split '.'
@@ -102,6 +104,7 @@ class Configuration
         obj[k] = {} if !obj.hasOwnProperty k
         obj = obj[k]
       obj[parts[parts.length - 1]] = val
+    this
   reset: (cb) ->
     this._log 'Reset initiated.'
     this.cleanUp ->
@@ -109,11 +112,13 @@ class Configuration
       this.persist ->
         this.dbg()
         cb() if cb?
+    this
   cleanUp: (cb) ->
     this._list (ignored, obj) ->
       regexp = new RegExp "(^|:)#{this.id}(:|$)"
       meta.configs.remove key for key of obj when regexp.test key # TODO why isn't there a callback param for remove?
       cb.call this
+    this
   checkStructure: (force, cb) ->
     if !force && this.cfg.version == this.version
       this.dbg()
@@ -126,5 +131,6 @@ class Configuration
         this.persist ->
           this.dbg()
           cb() if cb?
+    this
 
 module.exports = Configuration

@@ -2,23 +2,20 @@
 <hr />
 
 <form>
-  <div class="alert alert-info">
+  <div class="row">
     <p>
+      <h2>Stuff</h2>
       Color of selection-shadow: <input data-key="selectionColor" type="color" /><br>
       Delay between repeating action while key hold down: <input data-key="timeSpace" type="number" step="50" />
     </p>
     <p>
-      <h3>Actions</h3>
-      <h4>Dialog</h4>
-      <div data-key="actions.dialog.confirm" data-type="div" data-new='["27"]' data-attributes='{"data-type": "key", "data-new": "13"}'></div>
+      <h2>Actions</h2>
+      <p id="shortcuts-actions"></p>
     </p>
   </div>
+  <button class="btn btn-lg btn-primary" id="save">Save</button>
 </form>
 
-<button class="btn btn-lg btn-primary" id="save">Save</button>
-
 <script>
-  require(['../../plugins/nodebb-plugin-shortcuts/services/AdminSettings'], function(AdminSettings) {
-    AdminSettings.init();
-  });
+  require(['../../plugins/nodebb-plugin-shortcuts/services/admin/AdminSettings.js'],function(conf){conf()});
 </script>

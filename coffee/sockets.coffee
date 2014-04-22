@@ -4,13 +4,4 @@ initSockets = ->
     config.descriptions = descriptions
     cb null, config
 
-  ModulesSockets.shortcutsAdminSettings = (socket, data, cb) ->
-    try
-      new Configuration
-        name: data.id
-        version: data.version
-      , data.settings, false, false, true, ->
-        cfg.sync()
-        cb null
-    catch
-      cb 'error'
+  ModulesSockets.shortcutsAdminSettings = (socket, data, cb) -> cfg.set(data.settings).persist cb

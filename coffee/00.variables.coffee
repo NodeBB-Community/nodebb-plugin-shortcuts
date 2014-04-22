@@ -116,13 +116,6 @@ descriptions =
     item_next: "Select next item within cluster"
     item_prev: "Select previous item within cluster"
     highlight: "Highlight the selected item"
-  category:
-    _title: "Actions within a Category"
-    newTopic: "Create a new Topic"
-  topic:
-    _title: "Actions within a Topic"
-    reply: "Create a new reply"
-    threadTools: "Open Thread Tools"
   composer:
     _title: "Writing a post"
     send: "Send post"
@@ -138,6 +131,13 @@ descriptions =
     italic: "Make selected text italic"
     list: "Make selected text a list-item"
     link: "Make selected text a link-name"
+  category:
+    _title: "Actions within a Category"
+    newTopic: "Create a new Topic"
+  topic:
+    _title: "Actions within a Topic"
+    reply: "Create a new reply"
+    threadTools: "Open Thread Tools"
   dialog:
     _title: "Active dialog (bootbox)"
     confirm: "Confirm active dialog"
