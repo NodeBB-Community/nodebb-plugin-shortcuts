@@ -1,6 +1,6 @@
 {
     "name": "nodebb-plugin-shortcuts",
-    "version": "0.1.0-1",
+    "version": "0.1.0-2",
     "description": "Adds keyboard-shortcuts to NodeBB",
     "main": "index.js",
     "repository": {

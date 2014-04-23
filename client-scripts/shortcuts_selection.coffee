@@ -74,11 +74,14 @@
     selection.classified.removeClass 'shortcut-selection'
     selection.index = index
     selection.classified = $ selection.item()
-    if !selection.classified.height()
+    if !selection.classified.height() # no height => search children
       for c in selection.classified.children().toArray()
         if $(c).height()
           selection.classified = $ c
           break
+    if selection.classified.hasClass 'category-item' # Theme Lavender
+      icon = $ '.category-icon', selection.classified
+      selection.classified = icon if icon.length
     selection.classified.addClass 'shortcut-selection'
     scrollIntoView()
 
