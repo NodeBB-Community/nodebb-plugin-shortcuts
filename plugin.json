@@ -13,9 +13,6 @@
     "less": [
         "./styles/style.less"
     ],
-    "staticDirs": {
-        "services": "./services/client-side"
-    },
     "hooks": [
         {
             "hook": "action:plugin.activate",

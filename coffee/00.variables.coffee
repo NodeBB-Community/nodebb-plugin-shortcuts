@@ -3,12 +3,8 @@ plg = require './plugin.json'
 
 ModulesSockets = module.parent.require './socket.io/modules'
 io = module.parent.require './socket.io'
-Configuration = require './services/Configuration'
+Settings = module.parent.require './settings'
 Route = require './services/Route'
-
-debug = false
-forceUpdate = false
-reset = false
 
 plugin = Object.freeze
   name: plg.id.substring 14
@@ -24,64 +20,69 @@ defConfig =
   selectionColor: '#0059B2'
   actions:
     dialog:
-      confirm: ['89', '79', '90'] # y, o, z
-      close: ['78', '67', '27'] # n, c, Esc
+      confirm: ['#89', '#79', '#90'] # y, o, z
+      close: ['#78', '#67', '#27'] # n, c, Esc
     composer:
-      send: ['A-83'] # A-s
-      discard: ['A-68', 'S-27'] # A-d, S-Esc
-      preview: ['A-80'] # A-p
-      previewSend: ['C-13'] # C-Enter
-      writeSend: ['C-S-13'] # C-S-Enter
-      help: ['A-72'] # A-h
-      write: ['A-87'] # A-w
-      bold: ['A-66'] # A-b
-      italic: ['A-73'] # A-i
-      list: ['A-76'] # A-l
-      link: ['A-85'] # A-u
+      send: ['A+#83'] # A-s
+      discard: ['A+#68', 'S+#27'] # A-d, S-Esc
+      preview: ['A+#80'] # A-p
+      previewSend: ['C+#13'] # C-Enter
+      writeSend: ['C+S+#13'] # C-S-Enter
+      help: ['A+#72'] # A-h
+      write: ['A+#87'] # A-w
+      bold: ['A+#66'] # A-b
+      italic: ['A+#73'] # A-i
+      list: ['A+#76'] # A-l
+      link: ['A+#85'] # A-u
       closed:
-        title: ['A-S-84'] # A-S-t
-        input: ['73', 'C-73', 'A-S-73'] # i, C-i, A-S-i
+        title: ['A+S+#84'] # A-S-t
+        input: ['#73', 'C+#73', 'A+S+#73'] # i, C-i, A-S-i
     taskbar:
-      closeAll: ['A-67', 'A-88'] # A-c, A-x
-      clickFirst: ['A-86'] # A-v
-      clickLast: ['A-S-86'] # A-S-v
+      closeAll: ['A+#67', 'A+#88'] # A-c, A-x
+      clickFirst: ['A+#86'] # A-v
+      clickLast: ['A+S+#86'] # A-S-v
     breadcrumb:
-      up: ['A-38'] # A-Up
+      up: ['A+#38'] # A-Up
     topic:
-      reply: ['A-89', 'A-S-78', 'A-13'] # A-y, A-S-n, A-Enter
-      threadTools: ['A-84'] # A-t
+      reply: ['A+#89', 'A+S+#78', 'A+#13'] # A-y, A-S-n, A-Enter
+      threadTools: ['A+#84'] # A-t
     category:
-      newTopic: ['A-89', 'A-S-78', 'A-13'] # A-y, A-S-n, A-Enter
+      newTopic: ['A+#89', 'A+S+#78', 'A+#13'] # A-y, A-S-n, A-Enter
     selection:
-      follow: ['13', '32'] # Enter, Space
-      highlight: ['S-72'] # S-h
+      follow: ['#13', '#32'] # Enter, Space
+      highlight: ['S+#72'] # S-h
       area:
-        next: ['S-74'] # S-j
-        prev: ['S-75'] # S-k
+        next: ['S+#74'] # S-j
+        prev: ['S+#75'] # S-k
       item:
-        next: ['74'] # j
-        prev: ['75'] # k
+        next: ['#74'] # j
+        prev: ['#75'] # k
     navPills:
-      next: ['76'] # l
-      prev: ['72'] # h
+      next: ['#76'] # l
+      prev: ['#72'] # h
     header:
-      home: ['A-72', 'A-S-72'] # A-h, A-S-h
-      unread: ['A-85', 'A-S-85'] # A-u, A-S-u
-      recent: ['A-82', 'A-S-82'] # A-r, A-S-r
-      popular: ['A-80', 'A-S-80'] # A-p, A-S-p
-      users: ['A-83', 'A-S-83'] # A-s, A-S-s
-      notifications: ['A-78', 'A-S-78'] # A-n, A-S-n
-      chats: ['A-67', 'A-S-67'] # A-c, A-S-c
-      profile: ['A-79', 'A-S-79'] # A-o, A-S-o
+      home: ['A+#72', 'A+S+#72'] # A-h, A-S-h
+      unread: ['A+#85', 'A+S+#85'] # A-u, A-S-u
+      recent: ['A+#82', 'A+S+#82'] # A-r, A-S-r
+      popular: ['A+#80', 'A+S+#80'] # A-p, A-S-p
+      users: ['A+#83', 'A+S+#83'] # A-s, A-S-s
+      notifications: ['A+#78', 'A+S+#78'] # A-n, A-S-n
+      chats: ['A+#67', 'A+S+#67'] # A-c, A-S-c
+      profile: ['A+#79', 'A+S+#79'] # A-o, A-S-o
+      admin: ['A+#65', 'A+S+#65'] # A-a, A-S-a
+      search: ['#191'] # /
     body:
-      focus: ['S-221', '27'] # S-], Esc
+      focus: ['S+#221', '#27'] # S-], Esc
       scroll:
-        pageDown: ['68'] # d
-        pageUp: ['85'] # u
-        top: ['84'] # t
-        bottom: ['66'] # b
+        pageDown: ['#68'] # d
+        pageUp: ['#85'] # u
+        top: ['#84'] # t
+        bottom: ['#66'] # b
+      reload:
+        soft: ['#82'] # r
+        hard: ['C+#82', 'S+#82'] # C-r, S-r
 
-cfg = new Configuration plugin, defConfig, debug, forceUpdate, reset
+cfg = new Settings plugin.name, plugin.version, defConfig, null, false, false
 
 descriptions =
   body:
@@ -91,6 +92,8 @@ descriptions =
     scroll_pageUp: "Scroll one page up"
     scroll_top: "Scroll to top"
     scroll_bottom: "Scroll to bottom"
+    reload_soft: "Reload current page"
+    reload_hard: "Reload current page without hash"
   header:
     _title: "Navigation"
     home: "Go to home-site"
@@ -101,6 +104,7 @@ descriptions =
     notifications: "Go to notifications-site"
     profile: "Go to profile-site"
     chats: "Open chat-popup"
+    search: "Enter the search-field"
   navPills:
     _title: "Sub-navigation (nav-pills)"
     next: "Select next pill"
@@ -147,3 +151,7 @@ descriptions =
     closeAll: "Close all tasks"
     clickFirst: "Toggle first task"
     clickLast: "Toggle last task"
+  _admin:
+    header:
+      _title: "Navigation"
+      admin: "Open the admin-page"

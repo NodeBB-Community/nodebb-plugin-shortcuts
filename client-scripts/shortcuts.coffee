@@ -148,20 +148,27 @@
           res = cb args...
           return false if res == false && !force
           callback args...
+    getHelpMessageItems: (descriptions) ->
+      msg = ''
+      for scope, obj of descriptions when scope[0] != '_'
+        msg += "<h4>#{obj._title}</h4><ul>"
+        for name, description of obj when name != '_title'
+          keys = (kA.keyString for kA in this.actions["#{scope}_#{name}"]?.bindings)
+          if keys?.length
+            keys = keys.join ' | '
+            msg += "<li class='clearfix'><div class='description'>#{description}</div><div class='keys'>#{keys}</div></li>"
+        msg += "</ul>"
+      msg
     help: ->
       if document.querySelector '#shortcuts_help_body'
         $('.bootbox-close-button', d).click() for d in getActiveDialogs()
         return;
       msg = "<div id='shortcuts_help_body'>"
-      for scope, obj of this.helpMessages
-        msg += "<h4>#{obj._title}</h4><ul>"
-        for name, description of obj when name != '_title'
-          keys = (kA.keyString for kA in this.actions["#{scope}_#{name}"]?.bindings)
-          if keys
-            keys = keys.join ' | '
-            msg += "<li class='clearfix'><div class='description'>#{description}</div><div class='keys'>#{keys}</div></li>"
-        msg += "</ul>"
-      msg += "</ul></div>"
+      msg += this.getHelpMessageItems this.helpMessages
+      if app.isAdmin
+        msg += "<h3>Admin Actions</h3>"
+        msg += this.getHelpMessageItems this.helpMessages._admin
+      msg += "</div>"
       bootbox.dialog
         title: "NodeBB Shortcuts <small>#{this.version}</small>"
         message: msg

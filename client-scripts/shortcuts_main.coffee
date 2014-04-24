@@ -53,6 +53,8 @@
       scroll_pageUp: -> scrollPage -1
       scroll_top: -> scrollYTo 0
       scroll_bottom: -> scrollYTo 1
+      reload_soft: -> ajaxify.refresh()
+      reload_hard: -> location.href = /^([^#]*)(#[^\/]*)?$/.exec(location.href)[1]
     header:
       home: -> ajaxify.go ''
       unread: -> ajaxify.go 'unread'
@@ -61,6 +63,12 @@
       users: -> ajaxify.go 'users'
       notifications: -> ajaxify.go 'notifications'
       profile: -> ajaxify.go "user/#{app.username}"
+      admin: ->
+        if app.isAdmin
+          location.pathname = RELATIVE_PATH + "/admin"
+        else
+          false
+      search: -> $('#search-button').click()
       chats: -> $('#chat_dropdown').click()
     navPills:
       next: ->

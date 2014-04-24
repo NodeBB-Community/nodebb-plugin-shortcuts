@@ -1,7 +1,7 @@
 <h1>Shortcuts</h1>
 <hr />
 
-<form>
+<form id="settings_shortcuts">
   <div class="row">
     <p>
       <h2>Stuff</h2>
@@ -17,5 +17,46 @@
 </form>
 
 <script>
-  require(['../../plugins/nodebb-plugin-shortcuts/services/admin/AdminSettings.js'],function(conf){conf()});
+  function init() {
+    if (!socket || !app) {
+      setTimeout(run, 50);
+      return;
+    }
+    socket.emit('modules.shortcutsCfg', null, function (err, data) {
+      if (err) {
+        return app.alert({
+          alert_id: 'config_status',
+          timeout: 2500,
+          title: 'Settings Not Found',
+          message: 'Your plugin-settings have not been found. Please try re-enabling this plugin.',
+          type: 'danger'
+        });
+      }
+      var actions = $('#shortcuts-actions');
+      var addFieldsByDescriptions = function(descriptions) {
+        for (var sectionName in descriptions) {
+          if (sectionName[0] === '_')
+            continue;
+          var section = descriptions[sectionName];
+          var sectionString = "<div class='col-lg-4 col-sm-6 col-xs-12'><h3>" + section._title + "</h3>";
+          for (var key in section) {
+            if (key === '_title')
+              continue;
+            var description = section[key];
+            var fullKey = "actions." + sectionName + '.' + key.split('_').join('.');
+            sectionString += "<span>" + description + ": </span>" +
+              "<div data-key='" + fullKey + "' data-attributes='{\"type\":\"key\"}'></div><br>";
+          }
+          actions.append(sectionString + "</div>");
+        }
+      }
+      addFieldsByDescriptions(data.descriptions);
+      actions.append("<h2 style='clear: both;'>Admin Actions</h2>");
+      addFieldsByDescriptions(data.descriptions._admin);
+      require(['settings'], function (settings) {
+        settings.init('shortcuts');
+      });
+    });
+  }
+  init();
 </script>

@@ -5,4 +5,4 @@ module.exports.init = (app, middleware, ignored) ->
   initSockets()
 
 module.exports.pluginActivation = (id) ->
-  cfg.persistOnEmpty() if id == plg.id
+  cfg.checkStructure() if id == plg.id
