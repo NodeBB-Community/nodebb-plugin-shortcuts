@@ -52,8 +52,8 @@ defConfig =
       follow: ['#13', '#32'] # Enter, Space
       highlight: ['S+#72'] # S-h
       area:
-        next: ['S+#74'] # S-j
-        prev: ['S+#75'] # S-k
+        next: ['A+#74'] # A-j
+        prev: ['A+#75'] # A-k
       item:
         next: ['#74'] # j
         prev: ['#75'] # k
@@ -81,8 +81,11 @@ defConfig =
       reload:
         soft: ['#82'] # r
         hard: ['C+#82', 'S+#82'] # C-r, S-r
+      form:
+        next: ['A+#191'] # A+/
+        prev: ['A+S+#191'] # A+S+/
 
-cfg = new Settings plugin.name, plugin.version, defConfig, null, false, false
+cfg = new Settings plugin.name, plugin.version, defConfig, null, true, true
 
 descriptions =
   body:
@@ -94,6 +97,8 @@ descriptions =
     scroll_bottom: "Scroll to bottom"
     reload_soft: "Reload current page"
     reload_hard: "Reload current page without hash"
+    form_next: "Select next form-element or search if no form"
+    form_prev: "Select previous form-element or search if no form"
   header:
     _title: "Navigation"
     home: "Go to home-site"

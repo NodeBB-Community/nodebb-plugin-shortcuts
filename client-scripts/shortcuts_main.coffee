@@ -1,16 +1,11 @@
 (->
+  _h = shortcuts.helper
+
   toggleFirstComposer = ->
     tb = $('.taskbar li[data-module="composer"]')
     id = 'cmp-uuid-' + tb.data 'uuid'
     $('> a', tb)[0]?.click()
     document.getElementById id
-  getActiveComposer = ->
-    c = $('.composer')
-    for comp in c.toArray()
-      return comp if $(comp).css('visibility') != 'hidden'
-    null
-  getActiveDialogs = -> $('.modal-dialog').filter(':visible')
-  blurFocus = -> $('*:focus').blur()
 
   navPills =
     next: (nP) ->
@@ -25,7 +20,7 @@
         isNext = $(pill).hasClass 'active'
 
   scrollPage = (factor) ->
-    el = getActiveDialogs().parent()
+    el = _h.getActiveDialogs().parent()
     if el.length
       h = el.parent().height()
       el = el[0]
@@ -36,7 +31,7 @@
     el.scrollTop += h * factor
 
   scrollYTo = (percentage) ->
-    el = getActiveDialogs().parent()
+    el = _h.getActiveDialogs().parent()
     if el.length
       h = percentage * (el.children()[0].offsetHeight - el.height())
       el = el[0]
@@ -46,15 +41,41 @@
       document.documentElement.scrollTop = h
     el.scrollTop = h
 
+  getFormElements = -> $('.form-control,input,.btn').not('button,[disabled]').filter ':visible'
+
+  nextFormElement = (step = 1) ->
+    formEl = getFormElements()
+    return null if !formEl.length
+    focusEl = formEl.filter(':focus')[0]
+    i = if focusEl? then formEl.toArray().indexOf(focusEl) + step else if step > 0 then step - 1 else step
+    i += formEl.length while i < 0
+    i -= formEl.length while i >= formEl.length
+    formEl.eq i
+
   shortcuts.addActions
     body:
-      focus: -> blurFocus()
+      focus: ->
+        $('.open>.dropdown-toggle').click()
+        _h.blurFocus()
       scroll_pageDown: -> scrollPage 1
       scroll_pageUp: -> scrollPage -1
       scroll_top: -> scrollYTo 0
       scroll_bottom: -> scrollYTo 1
       reload_soft: -> ajaxify.refresh()
       reload_hard: -> location.href = /^([^#]*)(#[^\/]*)?$/.exec(location.href)[1]
+      form_next: ->
+        if (formEl = nextFormElement 1)?.length
+          formEl.focus()
+          _h.scrollIntoView formEl[0]
+        else
+          $('#search-button').click().length > 0
+      form_prev: ->
+        if (formEl = nextFormElement -1)?.length
+          formEl.focus()
+          _h.scrollIntoView formEl[0]
+        else
+          $('#search-button').click().length > 0
+
     header:
       home: -> ajaxify.go ''
       unread: -> ajaxify.go 'unread'
@@ -68,7 +89,7 @@
           location.pathname = RELATIVE_PATH + "/admin"
         else
           false
-      search: -> $('#search-button').click()
+      search: -> $('#search-button').click().length > 0
       chats: -> $('#chat_dropdown').click()
     navPills:
       next: ->
@@ -97,46 +118,46 @@
         return false if !btn?
         btn.click()
     composer:
-      send: -> $('button[data-action="post"]', getActiveComposer())[0].click()
-      discard: -> $('button[data-action="discard"]', getActiveComposer())[0].click()
+      send: -> $('button[data-action="post"]', _h.getActiveComposer())[0].click()
+      discard: -> $('button[data-action="discard"]', _h.getActiveComposer())[0].click()
       closed_input: ->
-        c = getActiveComposer() || toggleFirstComposer()
+        c = _h.getActiveComposer() || toggleFirstComposer()
         return false if !c?
         setTimeout (-> $('.write', c).focus()), 0
       closed_title: ->
-        c = getActiveComposer() || toggleFirstComposer()
+        c = _h.getActiveComposer() || toggleFirstComposer()
         return false if !c?
         setTimeout (-> $('.title', c).focus()), 0
       preview: ->
-        p = $ 'a[data-pane=".tab-preview"]', getActiveComposer()
+        p = $ 'a[data-pane=".tab-preview"]', _h.getActiveComposer()
         return false if p.parent().hasClass 'active'
         p[0].click()
       previewSend: ->
-        c = getActiveComposer()
+        c = _h.getActiveComposer()
         p = $ 'a[data-pane=".tab-preview"]', c
         if p.parent().hasClass 'active' then $('button[data-action="post"]', c)[0].click() else p[0].click()
       writeSend: ->
-        c = getActiveComposer()
+        c = _h.getActiveComposer()
         w = $ 'a[data-pane=".tab-write"]', c
         if w.parent().hasClass 'active' then $('button[data-action="post"]', c)[0].click() else w[0].click()
       help: ->
-        h = $ 'a[data-pane=".tab-help"]', getActiveComposer()
+        h = $ 'a[data-pane=".tab-help"]', _h.getActiveComposer()
         return false if h.parent().hasClass 'active'
         h[0].click()
       write: ->
-        c = getActiveComposer()
+        c = _h.getActiveComposer()
         w = $ 'a[data-pane=".tab-write"]', c
         if w.parent().hasClass 'active'
           $('.write', c).focus()
           return false
         w[0].click()
-      bold: -> $('.formatting-bar .fa-bold', getActiveComposer())[0].click()
-      italic: -> $('.formatting-bar .fa-italic', getActiveComposer())[0].click()
-      list: -> $('.formatting-bar .fa-list', getActiveComposer())[0].click()
-      link: -> $('.formatting-bar .fa-link', getActiveComposer())[0].click()
+      bold: -> $('.formatting-bar .fa-bold', _h.getActiveComposer())[0].click()
+      italic: -> $('.formatting-bar .fa-italic', _h.getActiveComposer())[0].click()
+      list: -> $('.formatting-bar .fa-list', _h.getActiveComposer())[0].click()
+      link: -> $('.formatting-bar .fa-link', _h.getActiveComposer())[0].click()
     dialog:
-      confirm: -> getActiveDialogs().each (ignored, d) -> $('.modal-footer>button', d)[1]?.click()
-      close: -> getActiveDialogs().each (ignored, d) -> $('.bootbox-close-button', d).click()
+      confirm: -> _h.getActiveDialogs().each (ignored, d) -> $('.modal-footer>button', d)[1]?.click()
+      close: -> _h.getActiveDialogs().each (ignored, d) -> $('.bootbox-close-button,.close', d).click()
     taskbar:
       closeAll: -> item.click() for item in $('.taskbar li.active>a').toArray()
       clickFirst: -> $('.taskbar li>a')[0]?.click()

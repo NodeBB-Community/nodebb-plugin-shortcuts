@@ -67,6 +67,54 @@
           parseBindings target, actions, keyName, fullName
         else
           addAction target, actions, new KeyAction(keyName, fullName)
+    helper:
+      selection:
+        classNames:
+          selection: 'shortcut-selection'
+          highlight_in: 'highlight-in'
+          highlight_out: 'highlight-out'
+        areas: []
+        index: -1
+        active:
+          area: undefined
+          item: $()
+        classified: $()
+        select: (areaIndex = this.index, itemIndex, toClassify = this.classified) ->
+          area = this.active.area = this.areas[this.index = areaIndex]
+          itemIndex = area?.index if !itemIndex?
+          area.index = itemIndex if area?
+          this.active.item = area?.item()
+          if this.classified[0] != toClassify[0]
+            this.classified.removeClass this.classNames.selection
+            shortcuts.helper.scrollIntoView (this.classified = toClassify.addClass this.classNames.selection)[0]
+        deselect: -> this.select -1, 0, $()
+        reset: (newAreas = []) ->
+          this.areas = newAreas
+          this.deselect()
+        highlight: ->
+          classified = this.classified
+          return false if !classified.length?
+          shortcuts.helper.scrollIntoView classified[0]
+          classified.addClass this.classNames.highlight_in
+          setTimeout ->
+            classified.addClass this.classNames.highlight_out
+            classified.removeClass this.classNames.highlight_in
+            setTimeout (-> classified.removeClass this.classNames.highlight_out), 200
+          , 500
+          true
+      blurFocus: -> $('*:focus').blur()
+      scrollIntoView: (item) ->
+        if item?
+          if item.scrollIntoViewIfNeeded? then item.scrollIntoViewIfNeeded() else item.scrollIntoView true
+          maxTop = $(item).offset().top - $('#header-menu').height() - 10
+          document.body.scrollTop = maxTop if document.body.scrollTop > maxTop
+          document.documentElement.scrollTop = maxTop if document.documentElement.scrollTop > maxTop
+      getActiveDialogs: -> $('.modal-dialog').filter(':visible').filter -> $(this).height()
+      getActiveComposer: ->
+        c = $('.composer').filter(':visible')
+        for comp in c.toArray()
+          return comp if $(comp).css('visibility') != 'hidden'
+        null
     version: ''
     bindings: []
     actions: {}
@@ -161,7 +209,7 @@
       msg
     help: ->
       if document.querySelector '#shortcuts_help_body'
-        $('.bootbox-close-button', d).click() for d in getActiveDialogs()
+        this.helper.getActiveDialogs().each (i, d) -> $('.bootbox-close-button', d).click()
         return;
       msg = "<div id='shortcuts_help_body'>"
       msg += this.getHelpMessageItems this.helpMessages
@@ -176,23 +224,12 @@
         $('#shortcuts_help_body>div').focus()
       , 100
 
-  getActiveComposer = ->
-    c = $('.composer').filter(':visible')
-    for comp in c.toArray()
-      return comp if $(comp).css('visibility') != 'hidden'
-    null
-
-  getActiveDialogs = ->
-    dialogs = []
-    $('.modal-dialog').each (i, d) -> dialogs.push d if $(d).height()
-    dialogs
-
   # Returns an array of action-prefixes to enable those actions
   getActionScopes = ->
     # dialog, composer, taskbar, breadcrumb, selection, navPills, scroll, header, topic, category
     scopes = []
-    return ['dialog', 'body'] if getActiveDialogs().length
-    if getActiveComposer()?
+    return ['dialog', 'body'] if shortcuts.helper.getActiveDialogs().length
+    if shortcuts.helper.getActiveComposer()?
       scopes.push 'composer'
     else if $('.taskbar li[data-module="composer"]').length
       scopes.push 'composer_closed'

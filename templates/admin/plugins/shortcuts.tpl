@@ -6,7 +6,7 @@
     <p>
       <h2>Stuff</h2>
       Color of selection-shadow: <input data-key="selectionColor" type="color" /><br>
-      Delay between repeating action while key hold down: <input data-key="timeSpace" type="number" step="50" />
+      Delay between repeating action while key hold down: <input data-key="timeSpace" type="number" step="50" style="width:50px;" /><span style="font-family:monospace;">ms</span>
     </p>
     <p>
       <h2>Actions</h2>
@@ -54,7 +54,14 @@
       actions.append("<h2 style='clear: both;'>Admin Actions</h2>");
       addFieldsByDescriptions(data.descriptions._admin);
       require(['settings'], function (settings) {
-        settings.init('shortcuts');
+        var wrapper = $('#settings_shortcuts');
+        settings.sync('shortcuts', wrapper);
+        $('#save').click(function(event){
+          event.preventDefault();
+          settings.persist('shortcuts', wrapper, function(){
+            socket.emit('modules.shortcutsRefresh');
+          });
+        });
       });
     });
   }
