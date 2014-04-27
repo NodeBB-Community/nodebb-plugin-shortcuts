@@ -13,6 +13,7 @@
       <p id="shortcuts-actions"></p>
     </p>
   </div>
+  <button class="btn btn-lg btn-warning" id="reset">Reset</button>
   <button class="btn btn-lg btn-primary" id="save">Save</button>
 </form>
 
@@ -56,10 +57,20 @@
       require(['settings'], function (settings) {
         var wrapper = $('#settings_shortcuts');
         settings.sync('shortcuts', wrapper);
-        $('#save').click(function(event){
+        $('#save').click(function(event) {
           event.preventDefault();
           settings.persist('shortcuts', wrapper, function(){
             socket.emit('modules.shortcutsRefresh');
+          });
+        });
+        $('#reset').click(function(event) {
+          event.preventDefault();
+          socket.emit('modules.shortcutsDefaults', null, function (err, data) {
+            settings.cfg = {"_settings": data};
+            settings.helper.initFields('form');
+            settings.persist('shortcuts', wrapper, function(){
+              socket.emit('modules.shortcutsRefresh');
+            });
           });
         });
       });

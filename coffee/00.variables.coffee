@@ -55,8 +55,8 @@ defConfig =
         next: ['A+#74'] # A-j
         prev: ['A+#75'] # A-k
       item:
-        next: ['#74'] # j
-        prev: ['#75'] # k
+        next: ['#74', 'A+S+#74'] # j, A-S-j
+        prev: ['#75', 'A+S+#75'] # k, A-S-k
     navPills:
       next: ['#76'] # l
       prev: ['#72'] # h
@@ -85,7 +85,7 @@ defConfig =
         next: ['A+#191'] # A+/
         prev: ['A+S+#191'] # A+S+/
 
-cfg = new Settings plugin.name, plugin.version, defConfig, null, true, true
+cfg = new Settings plugin.name, plugin.version, defConfig, null, false, false
 
 descriptions =
   body:

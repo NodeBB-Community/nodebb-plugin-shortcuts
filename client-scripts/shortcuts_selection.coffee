@@ -17,6 +17,7 @@
     refreshItems: (hooks = this.hooks) ->
       this.hooks = hooks
       this.items = $ hooks.selector, this.parent
+      this.items = this.parent.children hooks.selector if !this.items.length
     item: (index = this.index) -> this.items.eq index
 
   ###*
