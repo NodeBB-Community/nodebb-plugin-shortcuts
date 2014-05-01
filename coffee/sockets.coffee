@@ -5,5 +5,4 @@ initSockets = ->
     conf.version = pkg.version
     callback null, conf
   ModulesSockets.shortcutsRefresh = -> cfg.sync()
-  ModulesSockets.shortcutsDefaults = (socket, data, callback) ->
-    callback null, defConfig
+  ModulesSockets.shortcutsDefaults = (socket, data, callback) -> callback null, cfg.createDefaultWrapper()

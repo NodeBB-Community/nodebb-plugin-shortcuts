@@ -66,9 +66,7 @@
         $('#reset').click(function(event) {
           event.preventDefault();
           socket.emit('modules.shortcutsDefaults', null, function (err, data) {
-            settings.cfg = {"_settings": data};
-            settings.helper.initFields('form');
-            settings.persist('shortcuts', wrapper, function(){
+            settings.set('shortcuts', data, wrapper, function(){
               socket.emit('modules.shortcutsRefresh');
             });
           });
