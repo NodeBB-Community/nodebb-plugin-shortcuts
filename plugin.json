@@ -13,9 +13,6 @@
     "less": [
         "./styles/style.less"
     ],
-    "staticDirs": {
-        "services": "./services/client-side"
-    },
     "hooks": [
         {
             "hook": "action:plugin.activate",
@@ -30,5 +27,5 @@
             "method": "init"
         }
     ],
-    "minver": "0.4.0"
+    "minver": "0.4.2"
 }

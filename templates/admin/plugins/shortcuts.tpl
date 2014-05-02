@@ -54,7 +54,7 @@
       addFieldsByDescriptions(data.descriptions);
       actions.append("<h2 style='clear: both;'>Admin Actions</h2>");
       addFieldsByDescriptions(data.descriptions._admin);
-      require(['../../plugins/nodebb-plugin-shortcuts/services/settings.js'], function (settings) {
+      require(['settings'], function (settings) {
         var wrapper = $('#settings_shortcuts');
         settings.sync('shortcuts', wrapper);
         $('#save').click(function(event) {

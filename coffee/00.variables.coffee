@@ -3,7 +3,7 @@ plg = require './plugin.json'
 
 ModulesSockets = module.parent.require './socket.io/modules'
 io = module.parent.require './socket.io'
-Settings = require './services/settings'
+Settings = module.parent.require './settings'
 Route = require './services/Route'
 
 plugin = Object.freeze
