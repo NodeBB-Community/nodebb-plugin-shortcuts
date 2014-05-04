@@ -1,7 +1,8 @@
 pkg = require './package.json'
 plg = require './plugin.json'
 
-ModulesSockets = module.parent.require './socket.io/modules'
+SocketModules = module.parent.require './socket.io/modules'
+SocketAdmin = module.parent.require './socket.io/admin'
 io = module.parent.require './socket.io'
 Settings = module.parent.require './settings'
 Route = require './services/Route'

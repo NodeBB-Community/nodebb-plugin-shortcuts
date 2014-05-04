@@ -15,10 +15,6 @@
     ],
     "hooks": [
         {
-            "hook": "action:plugin.activate",
-            "method": "pluginActivation"
-        },
-        {
             "hook": "filter:admin.header.build",
             "method": "addAdminNavigation"
         },

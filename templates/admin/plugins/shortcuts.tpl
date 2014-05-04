@@ -18,12 +18,7 @@
 </form>
 
 <script>
-  function init() {
-    if (!socket || !app) {
-      setTimeout(run, 50);
-      return;
-    }
-    socket.emit('modules.shortcutsCfg', null, function (err, data) {
+    socket.emit('modules.getShortcutsSettings', null, function (err, data) {
       if (err) {
         return app.alert({
           alert_id: 'config_status',
@@ -60,19 +55,17 @@
         $('#save').click(function(event) {
           event.preventDefault();
           settings.persist('shortcuts', wrapper, function(){
-            socket.emit('modules.shortcutsRefresh');
+            socket.emit('admin.settings.syncShortcuts');
           });
         });
         $('#reset').click(function(event) {
           event.preventDefault();
-          socket.emit('modules.shortcutsDefaults', null, function (err, data) {
+          socket.emit('admin.settings.getShortcutsDefaults', null, function (err, data) {
             settings.set('shortcuts', data, wrapper, function(){
-              socket.emit('modules.shortcutsRefresh');
+              socket.emit('admin.settings.syncShortcuts');
             });
           });
         });
       });
     });
-  }
-  init();
 </script>

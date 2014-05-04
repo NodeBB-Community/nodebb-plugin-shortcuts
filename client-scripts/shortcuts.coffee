@@ -243,7 +243,7 @@
   window.shortcuts = new Shortcuts()
 
   $(document).ready ->
-    socket.emit 'modules.shortcutsCfg', null, (err, data) ->
+    socket.emit 'modules.getShortcutsSettings', null, (err, data) ->
       if err?
         console.error err
         return;
