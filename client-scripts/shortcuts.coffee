@@ -109,7 +109,7 @@
           maxTop = $(item).offset().top - $('#header-menu').height() - 10
           document.body.scrollTop = maxTop if document.body.scrollTop > maxTop
           document.documentElement.scrollTop = maxTop if document.documentElement.scrollTop > maxTop
-      getActiveDialogs: -> $('.modal-dialog').filter(':visible').filter -> $(this).height()
+      getActiveDialogs: -> $('.modal-dialog').not('.chat-modal>div').filter(':visible').filter -> $(this).height()
       getActiveComposer: ->
         c = $('.composer').filter(':visible')
         for comp in c.toArray()
