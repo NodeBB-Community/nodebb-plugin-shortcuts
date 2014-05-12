@@ -93,10 +93,10 @@
       chats: -> $('#chat_dropdown').click()
     navPills:
       next: ->
-        nP = $ '>li', $('.nav-pills')[0]
+        nP = $('>li', $('.nav-pills')[0]).not '.hide'
         if nP.css('float') == 'right' then navPills.prev nP else navPills.next nP
       prev: ->
-        nP = $ '>li', $('.nav-pills')[0]
+        nP = $('>li', $('.nav-pills')[0]).not '.hide'
         if nP.css('float') == 'right' then navPills.next nP else navPills.prev nP
     breadcrumb:
       up: ->
