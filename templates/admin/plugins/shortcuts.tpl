@@ -1,12 +1,12 @@
 <h1>Shortcuts</h1>
 <hr />
 
-<form id="settings_shortcuts">
+<form id="settings_shortcuts" class="form-inline">
   <div class="row">
     <p>
       <h2>Stuff</h2>
-      Color of selection-shadow: <input data-key="selectionColor" type="color" /><br>
-      Delay between repeating action while key hold down: <input data-key="timeSpace" type="number" step="50" style="width:50px;" /><span style="font-family:monospace;">ms</span>
+      Color of selection-shadow: <input data-key="selectionColor" type="color" class="form-control" style="width: 50px;" /><br>
+      Delay between repeating action while key hold down: <input data-key="timeSpace" type="number" step="50" class="form-control" style="width:60px;" /><span style="font-family:monospace;">ms</span>
     </p>
     <p>
       <h2>Actions</h2>
@@ -41,7 +41,7 @@
             var description = section[key];
             var fullKey = "actions." + sectionName + '.' + key.split('_').join('.');
             sectionString += "<span>" + description + ": </span>" +
-              "<div data-key='" + fullKey + "' data-attributes='{\"type\":\"key\"}'></div><br>";
+              "<div data-key='" + fullKey + "' data-attributes='{\"type\":\"key\",\"class\":\"form-control\",\"style\":\"width: 175px\"}'></div><br>";
           }
           actions.append(sectionString + "</div>");
         }
