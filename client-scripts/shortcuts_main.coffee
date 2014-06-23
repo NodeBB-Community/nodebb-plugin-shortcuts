@@ -130,12 +130,12 @@
         setTimeout (-> $('.title', c).focus()), 0
       preview: ->
         p = $ 'a[data-pane=".tab-preview"]', _h.getActiveComposer()
-        return false if p.parent().hasClass 'active'
+        return false if !p.length || p.parent().hasClass 'active'
         p[0].click()
       previewSend: ->
         c = _h.getActiveComposer()
         p = $ 'a[data-pane=".tab-preview"]', c
-        if p.parent().hasClass 'active' then $('button[data-action="post"]', c)[0].click() else p[0].click()
+        if !p.length || p.parent().hasClass 'active' then $('button[data-action="post"]', c)[0].click() else p[0].click()
       writeSend: ->
         c = _h.getActiveComposer()
         w = $ 'a[data-pane=".tab-write"]', c

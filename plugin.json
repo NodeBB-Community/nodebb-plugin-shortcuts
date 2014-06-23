@@ -22,6 +22,5 @@
             "hook": "action:app.load",
             "method": "init"
         }
-    ],
-    "minver": "0.4.2"
+    ]
 }
