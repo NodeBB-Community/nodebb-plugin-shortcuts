@@ -65,6 +65,7 @@ defConfig =
       home: ['A+#72', 'A+S+#72'] # A-h, A-S-h
       unread: ['A+#85', 'A+S+#85'] # A-u, A-S-u
       recent: ['A+#82', 'A+S+#82'] # A-r, A-S-r
+      tags: ['A+#84', 'A+S+#84'] # A-t, A-S-t
       popular: ['A+#80', 'A+S+#80'] # A-p, A-S-p
       users: ['A+#83', 'A+S+#83'] # A-s, A-S-s
       notifications: ['A+#78', 'A+S+#78'] # A-n, A-S-n
@@ -105,6 +106,7 @@ descriptions =
     home: "Go to home-site"
     unread: "Go to unread-site"
     recent: "Go to recent-site"
+    tags: "Go to tags-site"
     popular: "Go to popular-site"
     users: "Go to users-site"
     notifications: "Go to notifications-site"
