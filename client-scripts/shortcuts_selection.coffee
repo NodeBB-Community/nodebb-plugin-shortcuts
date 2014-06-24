@@ -38,7 +38,7 @@
         ->
           tid = this.closest('[data-tid]').data('tid') ||
             /\/topic\/(\d+)/.exec($('a[href^="/topic/"]', this).last().attr('href'))[1]
-          ajaxify.go "topic/#{tid}/##{this.data 'pid'}"
+          ajaxify.go (/^topic\/([^\/]+\/){2}/.exec(ajaxify.currentPage)?[0] || "topic/#{tid}/x/") + (1 + this.data 'index')
       ]
     topics:
       selector: '[data-tid]'
@@ -46,7 +46,7 @@
       follow: [
         ->
           url = $('[itemprop="url"]', this).attr 'href'
-          ajaxify.go if url then url.substring url.indexOf('/topic/') + 1 else 'topic/' + this.data('tid') + '/#'
+          ajaxify.go if url then url.substring url.indexOf('/topic/') + 1 else 'topic/' + this.data('tid')
       ]
     recent_topics:
       selector: '#recent_topics>li'

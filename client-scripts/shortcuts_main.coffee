@@ -80,6 +80,7 @@
       home: -> ajaxify.go ''
       unread: -> ajaxify.go 'unread'
       recent: -> ajaxify.go 'recent'
+      tags: -> ajaxify.go 'tags'
       popular: -> ajaxify.go 'popular'
       users: -> ajaxify.go 'users'
       notifications: -> ajaxify.go 'notifications'
