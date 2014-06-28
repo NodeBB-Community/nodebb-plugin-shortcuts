@@ -140,11 +140,22 @@
     area = _sel.active.area
     return false if !area?
     area.refreshItems()
-    index = area.index + step
-    length = area.items.length
-    index += length while index < 0
-    index -= length while index >= length
-    selectItem index
+    _s = 1
+    if step < 0
+      _s = -1
+      step = -step
+    index = area.index
+    res = false
+    while step--
+      length = area.items.length
+      next = ->
+        index += _s
+        index += length while index < 0
+        index -= length while index >= length
+        res = selectItem index
+      next()
+      next() while _sel.active.item && !_sel.active.item.is ':visible'
+    res
 
   #================================================= Area Management  =================================================#
 
