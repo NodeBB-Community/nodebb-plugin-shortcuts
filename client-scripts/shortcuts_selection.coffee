@@ -146,6 +146,7 @@
       step = -step
     index = area.index
     res = false
+    # step times select next visible item with step-width _s (1 or -1)
     while step--
       length = area.items.length
       next = ->
@@ -153,8 +154,12 @@
         index += length while index < 0
         index -= length while index >= length
         res = selectItem index
+      # select first next item that has a height != 0 and is visible
       next()
-      next() while _sel.active.item && !_sel.active.item.is ':visible'
+      tries = 1
+      while tries++ < length && _sel.active.item && !(_sel.active.item.height() && _sel.active.item.is ':visible')
+        # tries-counter to break if no item is visible
+        next()
     res
 
   #================================================= Area Management  =================================================#
