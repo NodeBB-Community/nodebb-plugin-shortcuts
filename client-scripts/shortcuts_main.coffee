@@ -140,15 +140,20 @@
       writeSend: ->
         c = _h.getActiveComposer()
         w = $ 'a[data-pane=".tab-write"]', c
-        if w.parent().hasClass 'active' then $('button[data-action="post"]', c)[0].click() else w[0].click()
+        if !w.length || w.parent().hasClass 'active' then $('button[data-action="post"]', c)[0].click() else w[0].click()
       help: ->
         h = $ 'a[data-pane=".tab-help"]', _h.getActiveComposer()
-        return false if h.parent().hasClass 'active'
-        h[0].click()
+        if h.length
+          return false if h.parent().hasClass 'active'
+          h[0].click()
+        else
+          h = $ '.help', _h.getActiveComposer()
+          return false if !h.length
+          h.click()
       write: ->
         c = _h.getActiveComposer()
         w = $ 'a[data-pane=".tab-write"]', c
-        if w.parent().hasClass 'active'
+        if !w.length || w.parent().hasClass 'active'
           $('.write', c).focus()
           return false
         w[0].click()
