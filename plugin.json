@@ -1,26 +1,27 @@
 {
-    "id": "nodebb-plugin-shortcuts",
-    "name": "Shortcuts",
-    "description": "Adds keyboard-shortcuts to NodeBB",
-    "url": "https://github.com/frissdiegurke/nodebb-plugin-shortcuts",
-    "library": "./index.js",
-    "scripts": [
-        "./client-scripts/shortcuts.js",
-        "./client-scripts/shortcuts_main.js",
-        "./client-scripts/shortcuts_selection.js"
-    ],
-    "templates": "./templates",
-    "less": [
-        "./styles/style.less"
-    ],
-    "hooks": [
-        {
-            "hook": "filter:admin.header.build",
-            "method": "addAdminNavigation"
-        },
-        {
-            "hook": "action:app.load",
-            "method": "init"
-        }
-    ]
+  "id": "nodebb-plugin-shortcuts",
+  "name": "Shortcuts",
+  "description": "Adds keyboard-shortcuts to NodeBB",
+  "url": "https://github.com/frissdiegurke/nodebb-plugin-shortcuts",
+  "library": "./index.js",
+  "scripts": [
+    "./client-scripts/shortcuts.js",
+    "./client-scripts/shortcuts_main.js",
+    "./client-scripts/shortcuts_selection.js"
+  ],
+  "templates": "./templates",
+  "less": [
+    "./styles/style.less"
+  ],
+  "hooks": [
+    {
+      "hook": "filter:admin.header.build",
+      "method": "addAdminNavigation"
+    },
+    {
+      "hook": "static:app.load",
+      "method": "init"
+    }
+  ],
+  "compatibility": "~0.5.0"
 }
