@@ -66,10 +66,13 @@
       selector: '.users-container>li'
       follow: [-> ajaxify.go $('a[href^="/user/"]', this).attr('href')?.substring 1]
     tags:
-      selector: 'div > a[href*="/tags/"]'
-      getClassElement: ->
-        label = $ '.label', this
-        if label.length then label else this
+      selector: 'h3 > a[href*="/tags/"]'
+      getArea: ->
+        new Area this.parent().parent()
+      follow: [-> this[0]?.click()]
+    chats:
+      selector: 'ul.chats-list.recent-chats > li'
+      getClassElement: -> $ 'span', this
       follow: [-> this[0]?.click()]
     dropDowns:
       selector: '[data-toggle="dropdown"]:not([disabled])'
