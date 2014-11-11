@@ -231,14 +231,7 @@
 
   shortcuts.prependToAction 'body_focus', -> _sel.deselect()
 
-  $(document).ready ->
-    _ag = ajaxify.go
-    ajaxify.go = (url, callback, quiet) ->
-      _ag url, ->
-        _sel.reset refreshAreas()
-        callback() if typeof callback == 'function'
-      , quiet
-
-    _sel.areas = refreshAreas()
+  $(window).on 'action:ajaxify.end', ->
+    _sel.reset refreshAreas()
 #
 )()
