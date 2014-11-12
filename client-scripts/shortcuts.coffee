@@ -1,5 +1,5 @@
 (->
-  debug = true
+  debug = false
 
   _dbg = (args...) -> console.log "Shortcuts DEBUG -", args...
   dbg = (args...) -> _dbg args... if debug
