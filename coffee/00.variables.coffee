@@ -68,6 +68,7 @@ defConfig =
       tags: ['A+#84', 'A+S+#84'] # A-t, A-S-t
       popular: ['A+#80', 'A+S+#80'] # A-p, A-S-p
       users: ['A+#83', 'A+S+#83'] # A-s, A-S-s
+      groups: ['A+#71', 'A+S+#71'] # A-g, A-S-g
       notifications: ['A+#78', 'A+S+#78'] # A-n, A-S-n
       chats: ['A+#67', 'A+S+#67'] # A-c, A-S-c
       profile: ['A+#79', 'A+S+#79'] # A-o, A-S-o
@@ -103,14 +104,15 @@ descriptions =
     form_prev: "Select previous form-element or search if no form"
   header:
     _title: "Navigation"
-    home: "Go to home-site"
-    unread: "Go to unread-site"
-    recent: "Go to recent-site"
-    tags: "Go to tags-site"
-    popular: "Go to popular-site"
-    users: "Go to users-site"
-    notifications: "Go to notifications-site"
-    profile: "Go to profile-site"
+    home: "Go to home-page"
+    unread: "Go to unread-page"
+    recent: "Go to recent-page"
+    tags: "Go to tags-page"
+    popular: "Go to popular-page"
+    users: "Go to users-page"
+    groups: "Go to groups-page"
+    notifications: "Go to notifications-page"
+    profile: "Go to profile-page"
     chats: "Open chat-popup"
     search: "Enter the search-field"
   navPills:
@@ -128,21 +130,6 @@ descriptions =
     item_next: "Select next item within cluster"
     item_prev: "Select previous item within cluster"
     highlight: "Highlight the selected item"
-  composer:
-    _title: "Writing a post"
-    send: "Send post"
-    discard: "Discard post"
-    closed_input: "Focus textarea (opens closed composer)"
-    closed_title: "Focus title-field (opens closed composer)"
-    preview: "Show preview-tab (deprecated)"
-    previewSend: "Show preview-tab or send post if already shown"
-    writeSend: "Show write-tab or send post if already shown"
-    help: "Show help"
-    write: "Show write-tab (deprecated)"
-    bold: "Make selected text bold"
-    italic: "Make selected text italic"
-    list: "Make selected text a list-item"
-    link: "Make selected text a link-name"
   category:
     _title: "Actions within a Category"
     newTopic: "Create a new Topic"
@@ -159,6 +146,21 @@ descriptions =
     closeAll: "Close all tasks"
     clickFirst: "Toggle first task"
     clickLast: "Toggle last task"
+  composer:
+    _title: "Writing a post"
+    send: "Send post"
+    discard: "Discard post"
+    closed_input: "Focus textarea (opens closed composer)"
+    closed_title: "Focus title-field (opens closed composer)"
+    preview: "Show preview-tab (deprecated)"
+    previewSend: "Show preview-tab or send post if already shown"
+    writeSend: "Show write-tab or send post if already shown"
+    help: "Show help"
+    write: "Show write-tab (deprecated)"
+    bold: "Make selected text bold"
+    italic: "Make selected text italic"
+    list: "Make selected text a list-item"
+    link: "Make selected text a link-name"
   _admin:
     header:
       _title: "Navigation"

@@ -83,6 +83,7 @@
       tags: -> ajaxify.go 'tags'
       popular: -> ajaxify.go 'popular'
       users: -> ajaxify.go 'users'
+      groups: -> ajaxify.go 'groups'
       notifications: -> ajaxify.go 'notifications'
       profile: -> ajaxify.go "user/#{app.username}"
       admin: ->

@@ -65,6 +65,10 @@
     users:
       selector: '.users-container>li'
       follow: [-> ajaxify.go $('a[href^="/user/"]', this).attr('href')?.substring 1]
+    groups:
+      selector: '#groups-list>div'
+      getClassElement: -> this.children().eq(0)
+      follow: [-> $('.panel-heading', this)[0]?.click()]
     tags:
       selector: 'h3 > a[href*="/tags/"]'
       getArea: ->
