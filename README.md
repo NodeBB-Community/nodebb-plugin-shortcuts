@@ -1,18 +1,23 @@
-# nodebb-plugin-shortcuts
+# [NodeBB](https://nodebb.org/) Plugin: **Shortcuts** *\<nodebb-plugin-shortcuts>*
 
-## Features
+[![License](https://img.shields.io/npm/l/nodebb-plugin-shortcuts.svg)](LICENSE)
+[![Version](https://img.shields.io/npm/v/nodebb-plugin-shortcuts.svg)](https://www.npmjs.com/package/nodebb-plugin-shortcuts)
+[![Downloads](https://img.shields.io/npm/dm/nodebb-plugin-shortcuts.svg)](https://www.npmjs.com/package/nodebb-plugin-shortcuts)
+[![Dependency Status](https://david-dm.org/frissdiegurke/nodebb-plugin-shortcuts.svg)](https://david-dm.org/frissdiegurke/nodebb-plugin-shortcuts)
+[![optionalDependencies Status](https://david-dm.org/frissdiegurke/nodebb-plugin-shortcuts/optional-status.svg)](https://david-dm.org/frissdiegurke/nodebb-plugin-shortcuts#info=optionalDependencies)
 
- + Adds multiple shortcuts to NodeBB like navigation, quick access to composer-features, etc.
- + Contains Help-message on `?` press
+Adds advanced keyboard support to your NodeBB.
 
 ## Installation
 
+To ensure compatibility with your NodeBB instance you should install nodebb-plugin-shortcuts via the NodeBB Admin Control Panel.
+
+### Manual installation
+
+The manual installation via [NPM](https://www.npmjs.com/) may result in version-conflicts with NodeBB.
+
     npm install nodebb-plugin-shortcuts
 
-## Future
+## Development
 
-Planned features are:
-
- + Admin-configurable default key-mapping, user-configurable key-mapping
- + Direct access to categories (A-S-[0-9])
- + User-specific quick-access routes (A-[0-9], set by C-A-[0-9])
+This module gets developed using the [NodeBB Grunt](https://github.com/frissdiegurke/nodebb-grunt-development) Framework.
