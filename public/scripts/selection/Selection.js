@@ -1,0 +1,215 @@
+"use strict";
+
+define("@{type.name}/@{id}/selection/Selection", [
+  "@{type.name}/@{id}/selection/Area",
+  "@{type.name}/@{id}/theme"
+], function (Area, theme) {
+  var CLASS_NAMES = {selection: "@{id}-selection", highlightIn: "highlight-in", highlightOut: "highlight-out"};
+  var CLASS_DELAYS = {highlightIn: 500, highlightKeep: 0, highlightOut: 200};
+  var NO_ELEMENT = $();
+
+  function Selection() {
+    this.areas = [];
+    this.index = -1;
+    this.active = {area: null, item: NO_ELEMENT};
+    this.elementWithClass = NO_ELEMENT;
+  }
+
+  Selection.prototype.select = function (areaIndex, itemIndex, $elementToAddClass) {
+    // default to saved container values
+    if (areaIndex == null) { areaIndex = this.index; }
+    if ($elementToAddClass == null) { $elementToAddClass = this.elementWithClass; }
+
+    var area = this.active.area = this.areas[this.index = areaIndex];
+    if (area == null) {
+      this.active.item = null;
+    } else {
+      // fallback item-index to saved value within area
+      // this ensures the index can be restored after another area was selected
+      if (itemIndex == null) { itemIndex = area.index; }
+      area.index = itemIndex;
+      // get active item
+      this.active.item = area.item();
+    }
+
+    if (this.elementWithClass[0] !== $elementToAddClass[0]) {
+      this.elementWithClass
+          .removeClass(CLASS_NAMES.selection)
+          .removeClass(CLASS_NAMES.highlightIn)
+          .removeClass(CLASS_NAMES.highlightOut);
+      this.elementWithClass = $elementToAddClass.addClass(CLASS_NAMES.selection);
+      theme.utils.scroll.elementIntoView(this.elementWithClass[0]);
+    }
+  };
+
+  Selection.prototype.deselect = function () { this.select(-1, 0, NO_ELEMENT); };
+
+  Selection.prototype.reset = function (newAreas) {
+    this.areas = newAreas == null ? [] : newAreas;
+    this.deselect();
+  };
+
+  Selection.prototype.highlight = function () {
+    var self = this;
+    var element = self.elementWithClass;
+    if (!element.length) { return false; }
+    // viewport correction
+    theme.utils.scroll.elementIntoView(element[0]);
+    // class manipulation
+    element.addClass(CLASS_NAMES.highlightIn);
+    setTimeout(function () {
+      element.removeClass(CLASS_NAMES.highlightIn);
+      setTimeout(function () {
+        if (element === self.elementWithClass) {
+          element.addClass(CLASS_NAMES.highlightOut);
+          setTimeout(function () { element.removeClass(CLASS_NAMES.highlightOut); }, CLASS_DELAYS.highlightOut);
+        }
+      }, CLASS_DELAYS.highlightKeep);
+    }, CLASS_DELAYS.highlightIn);
+    return true;
+  };
+
+
+  /**
+   Triggers the action of given grade and selected item.
+   @param index The grade of the action to trigger.
+   */
+  Selection.prototype.triggerAction = function (index) {
+    var area = this.active.area;
+    var follow = area != null && area.hooks.follow != null && area.hooks.follow[index];
+    return follow == null ? false : follow.call(this.active.item);
+  };
+
+  /**
+   Selects the item of given index within given Area (defaults to active Area).
+   @param index The index of the item to select.
+   @param areaIndex The index of the Area to select (defaults to active Area).
+   @returns Boolean Whether anything changed.
+   */
+  Selection.prototype.selectItem = function (index, areaIndex) {
+    if (areaIndex == null) { areaIndex = this.index; }
+    var area = this.areas[areaIndex];
+    var item = area && area.item(index);
+
+    if (item == null || areaIndex === this.index && index === areaIndex.index) { return false; }
+
+    // find element to highlight
+    var $elementToAddClass = item;
+    if (!$elementToAddClass.height()) { // no height => find first child with height
+      var children = $elementToAddClass.children().toArray(), child;
+      for (var i = 0; i < children.length; i++) {
+        child = $(children[i]);
+        if (child.height()) {
+          $elementToAddClass = child;
+          break;
+        }
+      }
+    }
+    if (typeof area.hooks.getClassElement === "function") {
+      $elementToAddClass = area.hooks.getClassElement.call($elementToAddClass, item);
+    }
+    // select item
+    this.select(areaIndex, index, $elementToAddClass);
+    // trigger focus hook
+    if (area.hooks.focus && typeof area.hooks.focus.item === "function") { area.hooks.focus.item.call(item); }
+    return true;
+  };
+
+  /**
+   Selects the item that gets found the given amount of items behind the active one.
+   @param step The amount of items to go ahead (may be negative too).
+   @returns Boolean Whether anything changed.
+   */
+  Selection.prototype.selectNextItem = function (step) {
+    if (step == null) { step = 1; }
+    var area = this.active.area;
+    if (area == null) { return false; }
+    area.refreshItems();
+    // normalize step
+    var stepDirection = 1;
+    if (step < 0) {
+      stepDirection = -1;
+      step = -step;
+    }
+    // step times select next visible item in stepDirection
+    var index = area.index, result = false;
+    var length = area.items.length, tries;
+    while (step--) {
+      tries = 0;
+      // select first next item that has a height != 0 and is visible, break if no item is visible (tries counter)
+      do {
+        index += stepDirection;
+        while (index < 0) { index += length; }
+        while (index >= length) { index -= length; }
+        result = this.selectItem(index);
+      } while (++tries < length && this.active.item && !(this.active.item.height() && this.active.item.is(":visible")));
+    }
+    return result;
+  };
+
+  /**
+   Generates a new array of all available Selection-Areas.
+   @returns Array The Array of all available Areas.
+   */
+  Selection.prototype.refreshAreas = function () {
+    var areas = [], items = [];
+    // iterate all relevant elements
+    $(theme.itemSelectorsJoined).each(function (ignored, item) {
+      if (items.indexOf(item) >= 0) { return; } // each item may only resolve to one area
+      var $item = $(item);
+      var area = null;
+      for (var key in theme.selection) {
+        if (theme.selection.hasOwnProperty(key)) {
+          var value = theme.selection[key];
+          if ($item.is(value.selector)) {
+            // get associated area object
+            area = typeof value.getArea === "function" ? value.getArea.call($item) : null;
+            if (area === false) { return; }
+            if (area == null) { area = new Area($item.parent()); }
+            if (area.items == null) { area.refreshItems(value); }
+            break;
+          }
+        }
+      }
+      // track items and area
+      area.items.each(function (ignored, elem) { items.push(elem); });
+      areas.push(area);
+    });
+    return areas;
+  };
+
+  /**
+   Selects the Area at given index within this.areas.
+   @param index The index of the Area to select.
+   @returns Boolean Whether anything changed.
+   */
+  Selection.prototype.selectArea = function (index) {
+    var area = this.areas[index], oldArea = this.active.area;
+    // FIXME scroll doesn't work correct if change to dropdown-area with index > 0 selected because hooks.focus.area() after scroll
+    if (!(area && area.items && area.items.length) || index === this.index || this.selectItem(area.index, index) === false) {
+      return false;
+    }
+    if (oldArea && oldArea.hooks && oldArea.hooks.blur && typeof oldArea.hooks.blur.area === "function") {
+      oldArea.hooks.blur.area.call(oldArea, area);
+    }
+    if (area.hooks.focus && typeof area.hooks.focus.area === "function") { area.hooks.focus.area.call(area, oldArea); }
+    return true;
+  };
+
+  /**
+   Selects the Area that gets found the given amount of Areas behind the active one.
+   @param step The amount of Areas to go ahead (may be negative too).
+   @returns Boolean Whether anything changed.
+   */
+  Selection.prototype.selectNextArea = function (step) {
+    if (step == null) { step = 1; }
+    if (!this.areas.length) { return false; }
+    var index = this.index < 0 ? step : this.index + step;
+    var length = this.areas.length;
+    while (index < 0) { index += length; }
+    while (index >= length) { index -= length; }
+    return this.selectArea(index);
+  };
+
+  return Selection;
+});
