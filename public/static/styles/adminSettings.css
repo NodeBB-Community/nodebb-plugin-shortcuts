@@ -1,0 +1,32 @@
+/*
+ * TODO use less and less-compiler
+ * TODO add custom button properties to Settings.Array
+ */
+
+#shortcuts-settings #shortcuts-actions input[type="key"], #shortcuts-settings #shortcuts-admin-actions input[type="key"] {
+  width: 80%;
+  display: inline-block;
+}
+
+#shortcuts-settings #shortcuts-actions button.remove, #shortcuts-settings #shortcuts-admin-actions button.remove {
+  width: 20%;
+  display: inline-block;
+  height: 34px;
+}
+
+#shortcuts-settings #shortcuts-actions button.add, #shortcuts-settings #shortcuts-admin-actions button.add {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  height: 34px;
+}
+
+#shortcuts-settings h3 {
+  font-size: 1.1em;
+  font-weight: bold;
+  text-align: center;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.1);
+  padding: 3px 5px;
+  margin-top: 0;
+}
