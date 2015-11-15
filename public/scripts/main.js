@@ -69,18 +69,24 @@ require([
             release: function () { return selection.deselect(); },
             follow: function () { return selection.triggerAction(0); },
             highlight: function () { return selection.highlight(); },
-            item_next: function () {
-              return selection.active.area == null ? selection.selectNextArea(0) : selection.selectNextItem(1);
+            item: {
+              next: function () {
+                return selection.active.area == null ? selection.selectNextArea(0) : selection.selectNextItem(1);
+              },
+              prev: function () {
+                return selection.active.area == null ? selection.selectNextArea(0) : selection.selectNextItem(-1);
+              }
             },
-            item_prev: function () {
-              return selection.active.area == null ? selection.selectNextArea(0) : selection.selectNextItem(-1);
-            },
-            area_next: function () { return selection.selectNextArea(1); },
-            area_prev: function () { return selection.selectNextArea(-1); }
+            area: {
+              next: function () { return selection.selectNextArea(1); },
+              prev: function () { return selection.selectNextArea(-1); }
+            }
+          },
+          body: {
+            focus: function () { return selection.deselect(); }
           }
         }
     );
-    shortcuts.prependToAction("body_focus", function () { return selection.deselect(); });
 
     // add theme related actions
     theme.done(function (theme) { if (theme.actionData != null) { shortcuts.addActions(theme.actionData); } });

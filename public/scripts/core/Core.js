@@ -23,6 +23,7 @@ define("@{type.name}/@{id}/Core", [
   /*-------------------------------------------- bindings initialization  --------------------------------------------*/
 
   Shortcuts.prototype.addKeyAction = function (keyAction) {
+    debug.log("addKeyAction", keyAction);
     this.bindings.push(keyAction);
     if (this.actions.hasOwnProperty(keyAction.action)) { this.actions[keyAction.action].bindings.push(keyAction); }
   };
@@ -38,7 +39,7 @@ define("@{type.name}/@{id}/Core", [
       if (actions.hasOwnProperty(name)) {
         keyName = actions[name];
         // concatenate full name
-        fullName = key + name;
+        fullName = key.length ? key + "." + name : name;
         // process value
         if (keyName instanceof Array) {
           for (i = 0; i < keyName.length; i++) {
@@ -64,6 +65,7 @@ define("@{type.name}/@{id}/Core", [
   };
 
   Shortcuts.prototype.addAction = function (name, cb) {
+    debug.log("addAction", name);
     var bindings = [];
     for (var i = 0; i < this.bindings.length; i++) {
       if (this.bindings[i].action === name) { bindings.push(this.bindings[i]); }
@@ -71,13 +73,17 @@ define("@{type.name}/@{id}/Core", [
     this.actions[name] = {cb: cb, bindings: bindings};
   };
 
-  Shortcuts.prototype.addActions = function (obj) {
-    var key, value, name;
-    for (key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        value = obj[key];
-        for (name in value) {
-          if (value.hasOwnProperty(name)) { this.addAction(key + "_" + name, value[name]); }
+  Shortcuts.prototype.addActions = function (actions, key) {
+    if (key == null) { key = ""; }
+    var value, currentKey;
+    for (var name in actions) {
+      if (actions.hasOwnProperty(name)) {
+        value = actions[name];
+        currentKey = key.length ? key + "." + name : name;
+        if (typeof value === "object") {
+          this.addActions(value, currentKey);
+        } else if (typeof value === "function") {
+          this.addAction(currentKey, value);
         }
       }
     }
@@ -123,7 +129,7 @@ define("@{type.name}/@{id}/Core", [
         keyAction = self.bindings[i];
         if (keyAction.matches(evt, key, isInput)) {
           for (j = 0; j < actionScopes.length; j++) {
-            if (keyAction.action.search(actionScopes[j]) === 0) {
+            if (keyAction.action.search(actionScopes[j] + ".") === 0) {
               matchingList.push({keyAction: keyAction, priority: j});
               break;
             }

@@ -5,32 +5,38 @@ define("@{type.name}/@{id}/theme-defaults/actions", function () {
     //noinspection JSUnusedGlobalSymbols
     theme.actions = {
       body: {
-        scroll_pageDown: function () { theme.utils.scroll.verticalPages(1); },
-        scroll_pageUp: function () { theme.utils.scroll.verticalPages(-1); },
-        scroll_top: function () { theme.utils.scroll.verticalAbsolute(0); },
-        scroll_bottom: function () { theme.utils.scroll.verticalAbsolute(1); },
-        reload_soft: function () { ajaxify.refresh(); },
-        reload_hard: function () { location.href = /^([^#]*)(#[^\/]*)?$/.exec(location.href)[1]; },
         focus: function () {
           $(".open>.dropdown-toggle").click();
           theme.utils.blurFocus();
         },
-        form_next: function () {
-          var formEl = theme.utils.formElements.getRelativeToFocused(1);
-          if (formEl != null && formEl.length) {
-            formEl.focus();
-            theme.utils.scroll.elementIntoView(formEl[0]);
-          } else {
-            return $("#search-button").click().length > 0;
-          }
+        scroll: {
+          pageDown: function () { theme.utils.scroll.verticalPages(1); },
+          pageUp: function () { theme.utils.scroll.verticalPages(-1); },
+          top: function () { theme.utils.scroll.verticalAbsolute(0); },
+          bottom: function () { theme.utils.scroll.verticalAbsolute(1); }
         },
-        form_prev: function () {
-          var formEl = theme.utils.formElements.getRelativeToFocused(-1);
-          if (formEl != null && formEl.length) {
-            formEl.focus();
-            theme.utils.scroll.elementIntoView(formEl[0]);
-          } else {
-            return $("#search-button").click().length > 0;
+        reload: {
+          soft: function () { ajaxify.refresh(); },
+          hard: function () { location.href = /^([^#]*)(#[^\/]*)?$/.exec(location.href)[1]; }
+        },
+        form: {
+          next: function () {
+            var formEl = theme.utils.formElements.getRelativeToFocused(1);
+            if (formEl != null && formEl.length) {
+              formEl.focus();
+              theme.utils.scroll.elementIntoView(formEl[0]);
+            } else {
+              return $("#search-button").click().length > 0;
+            }
+          },
+          prev: function () {
+            var formEl = theme.utils.formElements.getRelativeToFocused(-1);
+            if (formEl != null && formEl.length) {
+              formEl.focus();
+              theme.utils.scroll.elementIntoView(formEl[0]);
+            } else {
+              return $("#search-button").click().length > 0;
+            }
           }
         }
       },
@@ -107,15 +113,17 @@ define("@{type.name}/@{id}/theme-defaults/actions", function () {
       composer: {
         send: function () { $("button[data-action=\"post\"]", theme.composer.getActive())[0].click(); },
         discard: function () { return $("button[data-action=\"discard\"]", theme.composer.getActive())[0].click(); },
-        closed_input: function () {
-          var composer = theme.composer.getActive() || theme.composer.toggleFirst();
-          if (composer == null) { return false; }
-          setTimeout((function () { $(".write", composer).focus(); }), 0);
-        },
-        closed_title: function () {
-          var composer = theme.composer.getActive() || theme.composer.toggleFirst();
-          if (composer == null) { return false; }
-          setTimeout((function () { $(".title", composer).focus(); }), 0);
+        closed: {
+          input: function () {
+            var composer = theme.composer.getActive() || theme.composer.toggleFirst();
+            if (composer == null) { return false; }
+            setTimeout((function () { $(".write", composer).focus(); }), 0);
+          },
+          title: function () {
+            var composer = theme.composer.getActive() || theme.composer.toggleFirst();
+            if (composer == null) { return false; }
+            setTimeout((function () { $(".title", composer).focus(); }), 0);
+          }
         },
         preview: function () {
           var $preview = $("a[data-pane=\".tab-preview\"]", theme.composer.getActive());

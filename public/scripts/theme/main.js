@@ -22,7 +22,7 @@ define("@{type.name}/@{id}/theme", [
 
     require(["@{type.name}/@{id}/themes/" + themeID + "/main"], function (theme) {
       var result = {};
-      defaults(result);
+      defaults(result); // TODO call with shortcuts instance
       theme(result);
 
       var itemSelectorsJoined = "";
