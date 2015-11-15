@@ -15,7 +15,6 @@ define("@{type.name}/@{id}/Core", [
   function Shortcuts(cfg) {
     this.bindings = [];
     this.actions = {};
-    this.helpMessages = cfg.descriptions || {};
     this.repeatDelay = cfg.repeatDelay || 200;
     this.lastTriggered = {keyAction: null, time: 0};
     this.parseBindings(cfg.actions);
@@ -23,7 +22,7 @@ define("@{type.name}/@{id}/Core", [
 
   /*-------------------------------------------- bindings initialization  --------------------------------------------*/
 
-  Shortcuts.prototype.addKeyAction = function (actions, keyAction) {
+  Shortcuts.prototype.addKeyAction = function (keyAction) {
     this.bindings.push(keyAction);
     if (this.actions.hasOwnProperty(keyAction.action)) { this.actions[keyAction.action].bindings.push(keyAction); }
   };
@@ -112,49 +111,52 @@ define("@{type.name}/@{id}/Core", [
   Shortcuts.prototype.handleEvent = function (evt, key) {
     var isInput = !!~inputFields.indexOf(evt.target.tagName);
     var matchingList = [];
-    var actionScopes = theme.scopes.getCurrent();
-    var i, j;
-    debug.log("Scopes matching event-target", actionScopes);
+    var self = this;
+    theme.done(function (theme) {
+      var actionScopes = theme.scopes.getCurrent();
+      var i, j;
+      debug.log("Scopes matching event-target", actionScopes);
 
-    // collect all matching keyActions
-    var keyAction;
-    for (i = 0; i < this.bindings.length; i++) {
-      keyAction = this.bindings[i];
-      if (keyAction.matches(evt, key, isInput)) {
-        for (j = 0; j < actionScopes.length; j++) {
-          if (keyAction.action.search(actionScopes[j]) === 0) {
-            matchingList.push({keyAction: keyAction, priority: j});
-            break;
+      // collect all matching keyActions
+      var keyAction;
+      for (i = 0; i < self.bindings.length; i++) {
+        keyAction = self.bindings[i];
+        if (keyAction.matches(evt, key, isInput)) {
+          for (j = 0; j < actionScopes.length; j++) {
+            if (keyAction.action.search(actionScopes[j]) === 0) {
+              matchingList.push({keyAction: keyAction, priority: j});
+              break;
+            }
           }
         }
       }
-    }
 
-    if (matchingList.length) {
-      // sort matching keyActions by priority (by scope they apply to)
-      matchingList.sort(function (el1, el2) { return el1.priority - el2.priority; });
-      // log actions to be triggered if debugging is enabled
-      if (debug.enabled) {
-        var actions = $.map(matchingList, function (el) { return el.keyAction.action; });
-        debug._log("[" + actions.join(", ") + "] match the event.");
-      }
-      var now = $.now();
-      // trigger actions
-      for (i = 0; i < matchingList.length; i++) {
-        keyAction = matchingList[i].keyAction;
-        // if it's the same action that got triggered recently, delay it's re-trigger
-        if (keyAction === this.lastTriggered.keyAction && now - this.lastTriggered.time <= this.repeatDelay) {
-          break;
+      if (matchingList.length) {
+        // sort matching keyActions by priority (by scope they apply to)
+        matchingList.sort(function (el1, el2) { return el1.priority - el2.priority; });
+        // log actions to be triggered if debugging is enabled
+        if (debug.enabled) {
+          var actions = $.map(matchingList, function (el) { return el.keyAction.action; });
+          debug._log("[" + actions.join(", ") + "] match the event.");
         }
-        if (this.trigger(keyAction.action, evt) !== false) {
-          this.lastTriggered.keyAction = keyAction;
-          this.lastTriggered.time = now;
-          return;
+        var now = $.now();
+        // trigger actions
+        for (i = 0; i < matchingList.length; i++) {
+          keyAction = matchingList[i].keyAction;
+          // if it's the same action that got triggered recently, delay it's re-trigger
+          if (keyAction === self.lastTriggered.keyAction && now - self.lastTriggered.time <= self.repeatDelay) {
+            break;
+          }
+          if (self.trigger(keyAction.action, evt) !== false) {
+            self.lastTriggered.keyAction = keyAction;
+            self.lastTriggered.time = now;
+            return;
+          }
         }
       }
-    }
 
-    debug.log("No action got triggered");
+      debug.log("No action got triggered");
+    });
   };
 
   Shortcuts.prototype.trigger = function (actionName, evt) {
@@ -183,16 +185,17 @@ define("@{type.name}/@{id}/Core", [
     // TODO i18n
     var id = "@{id}-help-body";
     if ($("#" + id).length) {
-      return theme.dialogs.getOpened().each(function (i, el) { theme.dialogs.close(el); });
+      theme.done(function (theme) { theme.dialogs.getOpened().each(function (i, el) { theme.dialogs.close(el); }); });
+      return;
     }
     var msg = "<div id=\"" + id + "\">";
     // add standard messages
-    msg += this.getHelpMessageItems(this.helpMessages);
+    //msg += this.getHelpMessageItems(this.helpMessages);
     // show additional messages for admins
-    if (app.user.isAdmin) {
-      msg += "<h3>Admin Actions</h3>";
-      msg += this.getHelpMessageItems(this.helpMessages._admin);
-    }
+    //if (app.user.isAdmin) {
+    //  msg += "<h3>Admin Actions</h3>";
+    //  msg += this.getHelpMessageItems(this.helpMessages._admin);
+    //}
     msg += "</div>";
     // open dialog
     bootbox.dialog({title: "NodeBB @{nbbpm.name} <small>" + module.version + "</small>", message: msg});

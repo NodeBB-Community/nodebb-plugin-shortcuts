@@ -4,19 +4,23 @@
  * This file identifies which theme is in use and links the theme-specific module to /theme.
  */
 
-require(["@{type.name}/@{id}/debug"], function (debug) {
+define("@{type.name}/@{id}/theme", [
+  "@{type.name}/@{id}/debug",
+  "@{type.name}/@{id}/theme-defaults"
+], function (debug, defaults) {
   var SUPPORTED_THEMES = ["lavender", "persona"];
+  var defer = $.Deferred();
 
   $(document).ready(function () {
     var themeID = config["theme:id"].substring("nodebb-theme-".length);
 
     debug.log("Theme detected:", themeID);
-    if (!~SUPPORTED_THEMES.indexOf(themeID)) { return debug.error("Theme could not get identified."); }
+    if (!~SUPPORTED_THEMES.indexOf(themeID)) {
+      defer.reject(new Error("Theme could not get identified."));
+      return debug.error("Theme could not get identified.");
+    }
 
-    define("@{type.name}/@{id}/theme", [
-      "@{type.name}/@{id}/themes/" + themeID + "/main",
-      "@{type.name}/@{id}/theme-defaults"
-    ], function (theme, defaults) {
+    require(["@{type.name}/@{id}/themes/" + themeID + "/main"], function (theme) {
       var result = {};
       defaults(result);
       theme(result);
@@ -29,7 +33,9 @@ require(["@{type.name}/@{id}/debug"], function (debug) {
       }
       result.itemSelectorsJoined = itemSelectorsJoined.substring(0, itemSelectorsJoined.length - 1);
 
-      return result;
+      defer.resolve(result);
     });
   });
+
+  return defer;
 });

@@ -1,6 +1,5 @@
 "use strict";
 
-
 define("@{type.name}/@{id}/theme-defaults", [
   "@{type.name}/@{id}/theme-defaults/utils",
   "@{type.name}/@{id}/theme-defaults/scopes",
