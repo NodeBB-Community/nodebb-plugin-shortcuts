@@ -1,9 +1,6 @@
 "use strict";
 
-define("@{type.name}/@{id}/selection/Selection", [
-  "@{type.name}/@{id}/selection/Area",
-  "@{type.name}/@{id}/theme"
-], function (Area, theme) {
+define("@{type.name}/@{id}/selection/Selection", ["@{type.name}/@{id}/selection/Area"], function (Area) {
   var CLASS_NAMES = {selection: "@{id}-selection", highlightIn: "highlight-in", highlightOut: "highlight-out"};
   var CLASS_DELAYS = {highlightIn: 500, highlightKeep: 0, highlightOut: 200};
   var NO_ELEMENT = $();
@@ -14,6 +11,11 @@ define("@{type.name}/@{id}/selection/Selection", [
     this.active = {area: null, item: NO_ELEMENT};
     this.elementWithClass = NO_ELEMENT;
   }
+
+  Selection.prototype.attachTheme = function (theme) {
+    this.theme = theme;
+    this.reset(this.refreshAreas());
+  };
 
   Selection.prototype.select = function (areaIndex, itemIndex, $elementToAddClass) {
     var self = this;
@@ -39,7 +41,7 @@ define("@{type.name}/@{id}/selection/Selection", [
           .removeClass(CLASS_NAMES.highlightIn)
           .removeClass(CLASS_NAMES.highlightOut);
       this.elementWithClass = $elementToAddClass.addClass(CLASS_NAMES.selection);
-      theme.done(function (theme) { theme.utils.scroll.elementIntoView(self.elementWithClass[0]); });
+      if (this.theme != null) { this.theme.utils.scroll.elementIntoView(self.elementWithClass[0]); }
     }
   };
 
@@ -54,21 +56,19 @@ define("@{type.name}/@{id}/selection/Selection", [
     var self = this;
     var element = self.elementWithClass;
     if (!element.length) { return false; }
-    theme.done(function (theme) {
-      // viewport correction
-      theme.utils.scroll.elementIntoView(element[0]);
-      // class manipulation
-      element.addClass(CLASS_NAMES.highlightIn);
+    // viewport correction
+    if (this.theme != null) { this.theme.utils.scroll.elementIntoView(element[0]); }
+    // class manipulation
+    element.addClass(CLASS_NAMES.highlightIn);
+    setTimeout(function () {
+      element.removeClass(CLASS_NAMES.highlightIn);
       setTimeout(function () {
-        element.removeClass(CLASS_NAMES.highlightIn);
-        setTimeout(function () {
-          if (element === self.elementWithClass) {
-            element.addClass(CLASS_NAMES.highlightOut);
-            setTimeout(function () { element.removeClass(CLASS_NAMES.highlightOut); }, CLASS_DELAYS.highlightOut);
-          }
-        }, CLASS_DELAYS.highlightKeep);
-      }, CLASS_DELAYS.highlightIn);
-    });
+        if (element === self.elementWithClass) {
+          element.addClass(CLASS_NAMES.highlightOut);
+          setTimeout(function () { element.removeClass(CLASS_NAMES.highlightOut); }, CLASS_DELAYS.highlightOut);
+        }
+      }, CLASS_DELAYS.highlightKeep);
+    }, CLASS_DELAYS.highlightIn);
     return true;
   };
 
@@ -152,35 +152,35 @@ define("@{type.name}/@{id}/selection/Selection", [
 
   /**
    Generates a new array of all available Selection-Areas.
-   @returns Deferred The Array of all available Areas.
+   @returns Array The Array of all available Areas.
    */
   Selection.prototype.refreshAreas = function () {
+    if (this.theme == null) { return []; }
+    var theme = this.theme;
     var areas = [], items = [];
-    return theme.then(function (theme) {
-      // iterate all relevant elements
-      $(theme.itemSelectorsJoined).each(function (ignored, item) {
-        if (items.indexOf(item) >= 0) { return; } // each item may only resolve to one area
-        var $item = $(item);
-        var area = null;
-        for (var key in theme.selection) {
-          if (theme.selection.hasOwnProperty(key)) {
-            var value = theme.selection[key];
-            if ($item.is(value.selector)) {
-              // get associated area object
-              area = typeof value.getArea === "function" ? value.getArea.call($item) : null;
-              if (area === false) { return; }
-              if (area == null) { area = new Area($item.parent()); }
-              if (area.items == null) { area.refreshItems(value); }
-              break;
-            }
+    // iterate all relevant elements
+    $(theme.itemSelectorsJoined).each(function (ignored, item) {
+      if (items.indexOf(item) >= 0) { return; } // each item may only resolve to one area
+      var $item = $(item);
+      var area = null;
+      for (var key in theme.selection) {
+        if (theme.selection.hasOwnProperty(key)) {
+          var value = theme.selection[key];
+          if ($item.is(value.selector)) {
+            // get associated area object
+            area = typeof value.getArea === "function" ? value.getArea.call($item) : null;
+            if (area === false) { return; }
+            if (area == null) { area = new Area($item.parent()); }
+            if (area.items == null) { area.refreshItems(value); }
+            break;
           }
         }
-        // track items and area
-        area.items.each(function (ignored, elem) { items.push(elem); });
-        areas.push(area);
-      });
-      return areas;
+      }
+      // track items and area
+      area.items.each(function (ignored, elem) { items.push(elem); });
+      areas.push(area);
     });
+    return areas;
   };
 
   /**

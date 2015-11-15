@@ -1,7 +1,7 @@
 "use strict";
 
 define("@{type.name}/@{id}/theme-defaults/scopes", function () {
-  return function (theme) {
+  return function (shortcuts, theme) {
     theme.scopes = {
       getCurrent: function () {
         // if a dialog is opened, restrict scopes

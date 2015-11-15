@@ -1,12 +1,7 @@
 "use strict";
 
 // define module to keep the main instance of Core
-define("@{type.name}/@{id}/main", [
-  "@{type.name}/@{id}/debug",
-  "@{type.name}/@{id}/key-codes",
-  "@{type.name}/@{id}/input-fields",
-  "@{type.name}/@{id}/Core"
-], function (debug, keyCodes, inputFields, Core) {
+define("@{type.name}/@{id}/main", ["@{type.name}/@{id}/debug", "@{type.name}/@{id}/Core"], function (debug, Core) {
   var defer = $.Deferred();
 
   socket.emit("plugins.@{iD}", null, function (err, data) {
@@ -15,39 +10,16 @@ define("@{type.name}/@{id}/main", [
       return debug.error(err);
     }
     var settings = data.settings;
+    var $doc = $(document);
 
-    $(document).ready(function () {
+    $doc.ready(function () {
       // apply styles to document
       var styles = ".@{id}-selection { box-shadow:0 0 5px 1px " + settings.selectionColor + " !important; }";
       $("<style type=\"text/css\">" + styles + "</style>").appendTo("head");
 
       // create main instance
       var shortcuts = new Core(settings);
-
-      // watch for keyboard events and forward them (normalized) to core instance
-      $(document).keydown(function (event) {
-        var key;
-        event = event || window.event;
-        key = event.which = event.which || event.keyCode || event.key;
-        if (debug.enabled) { // don't calculate logging string if disabled enyways
-          debug._log("Key Down: " + (event.ctrlKey ? "C-" : "") + (event.altKey ? "A-" : "") + (event.shiftKey ? "S-" : "") + (event.metaKey ? "M-" : "") + key);
-        }
-        shortcuts.handleEvent(event, key);
-      });
-      $(document).keyup(function () {
-        shortcuts.released();
-      });
-
-      // watch for "?" key pressed to show help modal
-      $(document).keypress(function (event) {
-        var key;
-        event = event || window.event;
-        if (~inputFields.indexOf(event.target.tagName)) {
-          key = event.which || event.keyCode || event.key;
-          if (key === keyCodes.questionMark) { shortcuts.help(); }
-        }
-      });
-
+      shortcuts.startWatching($doc);
       defer.resolve(shortcuts);
     });
   });
@@ -56,39 +28,69 @@ define("@{type.name}/@{id}/main", [
 });
 
 require([
+          "@{type.name}/@{id}/debug",
           "@{type.name}/@{id}/main",
           "@{type.name}/@{id}/theme",
-          "@{type.name}/@{id}/selection/main"
-        ], function (shortcuts, theme, selection) {
+          "@{type.name}/@{id}/selection/Selection",
+          "@{type.name}/@{id}/theme-defaults"
+        ], function (debug, shortcuts, theme, Selection, themeDefaults) {
   shortcuts.done(function (shortcuts) {
-    // add selection related actions
-    //noinspection JSUnusedGlobalSymbols
-    shortcuts.addActions(
-        {
-          selection: {
-            release: function () { return selection.deselect(); },
-            follow: function () { return selection.triggerAction(0); },
-            highlight: function () { return selection.highlight(); },
-            item: {
-              next: function () {
-                return selection.active.area == null ? selection.selectNextArea(0) : selection.selectNextItem(1);
-              },
-              prev: function () {
-                return selection.active.area == null ? selection.selectNextArea(0) : selection.selectNextItem(-1);
-              }
-            },
-            area: {
-              next: function () { return selection.selectNextArea(1); },
-              prev: function () { return selection.selectNextArea(-1); }
-            }
-          },
-          body: {
-            focus: function () { return selection.deselect(); }
+    // resolve theme module
+    var SUPPORTED_THEMES = ["lavender", "persona"];
+    var themeID = config["theme:id"].substring("nodebb-theme-".length);
+
+    if (~SUPPORTED_THEMES.indexOf(themeID)) {
+      debug.log("Theme detected.", themeID);
+
+      require(["@{type.name}/@{id}/themes/" + themeID + "/main"], function (theme) {
+        // add theme related actions
+        var result = {};
+        themeDefaults(shortcuts, result);
+        theme(shortcuts, result);
+
+        var itemSelectorsJoined = "";
+        for (var key in result.selection) {
+          if (result.selection.hasOwnProperty(key)) {
+            itemSelectorsJoined += (result.selection[key].selector += ":visible") + ",";
           }
         }
-    );
+        result.itemSelectorsJoined = itemSelectorsJoined.substring(0, itemSelectorsJoined.length - 1);
 
-    // add theme related actions
-    theme.done(function (theme) { if (theme.actionData != null) { shortcuts.addActions(theme.actionData); } });
+        shortcuts.attachTheme(result);
+
+        // create new selection instance
+        var selection = new Selection();
+        $(window).on("action:ajaxify.end", function () { selection.reset(selection.refreshAreas()); });
+
+        // add selection related actions
+        //noinspection JSUnusedGlobalSymbols
+        shortcuts.mergeActions(
+            {
+              selection: {
+                release: function () { return selection.deselect(); },
+                follow: function () { return selection.triggerAction(0); },
+                highlight: function () { return selection.highlight(); },
+                item: {
+                  next: function () {
+                    return selection.active.area == null ? selection.selectNextArea(0) : selection.selectNextItem(1);
+                  },
+                  prev: function () {
+                    return selection.active.area == null ? selection.selectNextArea(0) : selection.selectNextItem(-1);
+                  }
+                },
+                area: {
+                  next: function () { return selection.selectNextArea(1); },
+                  prev: function () { return selection.selectNextArea(-1); }
+                }
+              }
+            }
+        );
+        shortcuts.prependToAction("body.focus", function () { return selection.deselect(); });
+
+        selection.attachTheme(result);
+      });
+    } else {
+      debug.error("Theme not supported.", themeID);
+    }
   });
 });

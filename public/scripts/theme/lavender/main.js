@@ -9,4 +9,6 @@
 
 define("@{type.name}/@{id}/themes/lavender/main", [
   "@{type.name}/@{id}/themes/lavender/selection"
-], function (selection) { return function (theme) { selection(theme); }; });
+], function (selection) {
+  return function (shortcuts, theme) { selection(shortcuts, theme); };
+});

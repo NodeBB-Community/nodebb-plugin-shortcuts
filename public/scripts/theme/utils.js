@@ -1,7 +1,7 @@
 "use strict";
 
 define("@{type.name}/@{id}/theme-defaults/utils", function () {
-  return function (theme) {
+  return function (shortcuts, theme) {
     theme.utils = {
       blurFocus: function () { $("*:focus").blur(); },
       getTopOffset: function (element) { return $(element).offset().top - theme.utils.getHeaderHeight(); },

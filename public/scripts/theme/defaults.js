@@ -5,10 +5,10 @@ define("@{type.name}/@{id}/theme-defaults", [
   "@{type.name}/@{id}/theme-defaults/scopes",
   "@{type.name}/@{id}/theme-defaults/actions"
 ], function (defaultUtils, defaultScopes, defaultActions) {
-  return function (theme) {
-    defaultUtils(theme);
-    defaultScopes(theme);
-    defaultActions(theme);
+  return function (shortcuts, theme) {
+    defaultUtils(shortcuts, theme);
+    defaultScopes(shortcuts, theme);
+    defaultActions(shortcuts, theme);
 
     theme.dialogs = {
       getOpened: function () {

@@ -5,8 +5,8 @@ define("@{type.name}/@{id}/Core", [
   "@{type.name}/@{id}",
   "@{type.name}/@{id}/input-fields",
   "@{type.name}/@{id}/KeyAction",
-  "@{type.name}/@{id}/theme"
-], function (debug, module, inputFields, KeyAction, theme) {
+  "@{type.name}/@{id}/key-codes"
+], function (debug, module, inputFields, KeyAction, keyCodes) {
 
   /*=================================================== Core Class ===================================================*/
 
@@ -19,6 +19,10 @@ define("@{type.name}/@{id}/Core", [
     this.lastTriggered = {keyAction: null, time: 0};
     this.parseBindings(cfg.actions);
   }
+
+  Shortcuts.prototype.attachTheme = function (theme) {
+    this.theme = theme;
+  };
 
   /*-------------------------------------------- bindings initialization  --------------------------------------------*/
 
@@ -56,16 +60,40 @@ define("@{type.name}/@{id}/Core", [
 
   /*----------------------------------------------- action management  -----------------------------------------------*/
 
+  Shortcuts.prototype.startWatching = function ($doc) {
+    var self = this;
+    // watch for keyboard events and forward them (normalized) to core instance
+    $doc.keydown(function (event) {
+      var key;
+      event = event || window.event;
+      key = event.which = event.which || event.keyCode || event.key;
+      if (debug.enabled) { // don't calculate logging string if disabled enyways
+        debug._log("Key Down: " + (event.ctrlKey ? "C-" : "") + (event.altKey ? "A-" : "") + (event.shiftKey ? "S-" : "") + (event.metaKey ? "M-" : "") + key);
+      }
+      self.handleEvent(event, key);
+    });
+    $doc.keyup(function () { self.released(); });
+    // watch for "?" key pressed to show help modal
+    $doc.keypress(function (event) {
+      var key;
+      event = event || window.event;
+      if (~inputFields.indexOf(event.target.tagName)) {
+        key = event.which || event.keyCode || event.key;
+        if (key === keyCodes.questionMark) { self.help(); }
+      }
+    });
+  };
+
   Shortcuts.prototype.wrapAction = function (actionName, cb) {
     if (this.actions.hasOwnProperty(actionName)) {
       this.actions[actionName].cb = cb(this.actions[actionName].cb);
     } else {
-      this.addAction(actionName, cb($.noop));
+      this.setAction(actionName, cb($.noop));
     }
   };
 
-  Shortcuts.prototype.addAction = function (name, cb) {
-    debug.log("addAction", name);
+  Shortcuts.prototype.setAction = function (name, cb) {
+    debug.log("setAction", name);
     var bindings = [];
     for (var i = 0; i < this.bindings.length; i++) {
       if (this.bindings[i].action === name) { bindings.push(this.bindings[i]); }
@@ -73,7 +101,7 @@ define("@{type.name}/@{id}/Core", [
     this.actions[name] = {cb: cb, bindings: bindings};
   };
 
-  Shortcuts.prototype.addActions = function (actions, key) {
+  Shortcuts.prototype.mergeActions = function (actions, key) {
     if (key == null) { key = ""; }
     var value, currentKey;
     for (var name in actions) {
@@ -81,9 +109,9 @@ define("@{type.name}/@{id}/Core", [
         value = actions[name];
         currentKey = key.length ? key + "." + name : name;
         if (typeof value === "object") {
-          this.addActions(value, currentKey);
+          this.mergeActions(value, currentKey);
         } else if (typeof value === "function") {
-          this.addAction(currentKey, value);
+          this.setAction(currentKey, value);
         }
       }
     }
@@ -115,54 +143,52 @@ define("@{type.name}/@{id}/Core", [
   Shortcuts.prototype.released = function () { this.lastTriggered.time = 0; };
 
   Shortcuts.prototype.handleEvent = function (evt, key) {
+    if (this.theme == null) { return; }
     var isInput = !!~inputFields.indexOf(evt.target.tagName);
     var matchingList = [];
-    var self = this;
-    theme.done(function (theme) {
-      var actionScopes = theme.scopes.getCurrent();
-      var i, j;
-      debug.log("Scopes matching event-target", actionScopes);
+    var actionScopes = this.theme.scopes.getCurrent();
+    var i, j;
+    debug.log("Scopes matching event-target", actionScopes);
 
-      // collect all matching keyActions
-      var keyAction;
-      for (i = 0; i < self.bindings.length; i++) {
-        keyAction = self.bindings[i];
-        if (keyAction.matches(evt, key, isInput)) {
-          for (j = 0; j < actionScopes.length; j++) {
-            if (keyAction.action.search(actionScopes[j] + ".") === 0) {
-              matchingList.push({keyAction: keyAction, priority: j});
-              break;
-            }
-          }
-        }
-      }
-
-      if (matchingList.length) {
-        // sort matching keyActions by priority (by scope they apply to)
-        matchingList.sort(function (el1, el2) { return el1.priority - el2.priority; });
-        // log actions to be triggered if debugging is enabled
-        if (debug.enabled) {
-          var actions = $.map(matchingList, function (el) { return el.keyAction.action; });
-          debug._log("[" + actions.join(", ") + "] match the event.");
-        }
-        var now = $.now();
-        // trigger actions
-        for (i = 0; i < matchingList.length; i++) {
-          keyAction = matchingList[i].keyAction;
-          // if it's the same action that got triggered recently, delay it's re-trigger
-          if (keyAction === self.lastTriggered.keyAction && now - self.lastTriggered.time <= self.repeatDelay) {
+    // collect all matching keyActions
+    var keyAction;
+    for (i = 0; i < this.bindings.length; i++) {
+      keyAction = this.bindings[i];
+      if (keyAction.matches(evt, key, isInput)) {
+        for (j = 0; j < actionScopes.length; j++) {
+          if (keyAction.action.search(actionScopes[j] + ".") === 0) {
+            matchingList.push({keyAction: keyAction, priority: j});
             break;
           }
-          if (self.trigger(keyAction.action, evt) !== false) {
-            self.lastTriggered.keyAction = keyAction;
-            self.lastTriggered.time = now;
-            return;
-          }
         }
       }
+    }
 
-      debug.log("No action got triggered");
-    });
+    if (matchingList.length) {
+      // sort matching keyActions by priority (by scope they apply to)
+      matchingList.sort(function (el1, el2) { return el1.priority - el2.priority; });
+      // log actions to be triggered if debugging is enabled
+      if (debug.enabled) {
+        var actions = $.map(matchingList, function (el) { return el.keyAction.action; });
+        debug._log("[" + actions.join(", ") + "] match the event.");
+      }
+      var now = $.now();
+      // trigger actions
+      for (i = 0; i < matchingList.length; i++) {
+        keyAction = matchingList[i].keyAction;
+        // if it's the same action that got triggered recently, delay it's re-trigger
+        if (keyAction === this.lastTriggered.keyAction && now - this.lastTriggered.time <= this.repeatDelay) {
+          break;
+        }
+        if (this.trigger(keyAction.action, evt) !== false) {
+          this.lastTriggered.keyAction = keyAction;
+          this.lastTriggered.time = now;
+          return;
+        }
+      }
+    }
+
+    debug.log("No action got triggered");
   };
 
   Shortcuts.prototype.trigger = function (actionName, evt) {
@@ -190,8 +216,11 @@ define("@{type.name}/@{id}/Core", [
   Shortcuts.prototype.help = function () {
     // TODO i18n
     var id = "@{id}-help-body";
+    var theme = this.theme;
     if ($("#" + id).length) {
-      theme.done(function (theme) { theme.dialogs.getOpened().each(function (i, el) { theme.dialogs.close(el); }); });
+      if (theme != null) {
+        theme.dialogs.getOpened().each(function (i, el) { theme.dialogs.close(el); });
+      }
       return;
     }
     var msg = "<div id=\"" + id + "\">";
