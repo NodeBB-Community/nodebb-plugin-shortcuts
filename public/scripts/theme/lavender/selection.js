@@ -4,26 +4,32 @@ define("@{type.name}/@{id}/themes/lavender/selection", ["@{type.name}/@{id}/sele
   return function (shortcuts, theme) {
     theme.selection = {
       posts: {
-        selector: "[data-pid]",
+        selector: "[component=\"post\"]",
         follow: [
-          function () {
-            var topicId = this.closest("[data-tid]").data("tid") ||
-                /\/topic\/(\d+)/.exec($("a[href^=\"/topic/\"]", this).last().attr("href"))[1];
-            var url = /^topic\/([^\/]+\/){2}/.exec(ajaxify.currentPage);
-            ajaxify.go((url && url[0] || ("topic/" + topicId + "/x/")) + (1 + this.data("index")));
-          }
+          function () { ajaxify.go("topic/" + ajaxify.data.slug + "/" + (1 + this.data("index"))); }
         ]
       },
       topics: {
-        selector: "[data-tid]",
-        getArea: function () { return this.is("#post-container") ? false : new Area(this.parent()); },
+        selector: "[component=\"category/topic\"]",
         follow: [
           function () {
-            var url = $("[itemprop=\"url\"]", this).attr("href");
-            ajaxify.go(url ? url.substring(url.indexOf("/topic/") + 1) : "topic/" + this.data("tid"));
+            var $link = $(".replies > a[href*=\"/topic/\"]", this);
+            if (!$link.length) { $link = $("[component=\"topic/header\"],.topic-title", this); }
+            if ($link.length) { ajaxify.go($link.attr("href")); }
+          },
+          function () {
+            var $link = $("[component=\"topic/header\"],.topic-title", this);
+            if ($link.length) { ajaxify.go($link.attr("href")); }
           }
         ]
       },
+      categories: {
+        selector: "[component=\"categories/category\"]",
+        follow: [
+          function () { ajaxify.go("category/" + this.data("cid")); }
+        ]
+      },
+      // TODO check following actions...
       recent_topics: {
         selector: "#recent_topics>li",
         follow: [
@@ -31,19 +37,6 @@ define("@{type.name}/@{id}/themes/lavender/selection", ["@{type.name}/@{id}/sele
             var url = $("a[href^=\"/topic/\"]", this).last().attr("href");
             ajaxify.go(url == null ? null : url.substring(1));
           }
-        ]
-      },
-      categories: {
-        selector: "[data-cid]",
-        getClassElement: function () {
-          if (this.hasClass("category-item")) {
-            var icon = $(".category-icon", this);
-            if (icon.length) { return icon; }
-          }
-          return this;
-        },
-        follow: [
-          function () { ajaxify.go("category/" + this.data("cid")); }
         ]
       },
       notifications: {
