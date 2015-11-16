@@ -1,6 +1,9 @@
 "use strict";
 
-define("@{type.name}/@{id}/selection/Selection", ["@{type.name}/@{id}/selection/Area"], function (Area) {
+define("@{type.name}/@{id}/selection/Selection", [
+  "@{type.name}/@{id}/debug",
+  "@{type.name}/@{id}/selection/Area"
+], function (debug, Area) {
   var CLASS_NAMES = {selection: "@{id}-selection", highlightIn: "highlight-in", highlightOut: "highlight-out"};
   var CLASS_DELAYS = {highlightIn: 500, highlightKeep: 0, highlightOut: 200};
   var NO_ELEMENT = $();
@@ -43,6 +46,8 @@ define("@{type.name}/@{id}/selection/Selection", ["@{type.name}/@{id}/selection/
       this.elementWithClass = $elementToAddClass.addClass(CLASS_NAMES.selection);
       if (this.theme != null) { this.theme.utils.scroll.elementIntoView(self.elementWithClass[0]); }
     }
+
+    debug.log("Selection item changed", areaIndex, itemIndex);
   };
 
   Selection.prototype.deselect = function () { this.select(-1, 0, NO_ELEMENT); };
@@ -183,6 +188,7 @@ define("@{type.name}/@{id}/selection/Selection", ["@{type.name}/@{id}/selection/
         areas.push(area);
       }
     });
+    debug.log("Selection Areas refreshed", areas);
     return areas;
   };
 
