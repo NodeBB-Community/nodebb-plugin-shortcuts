@@ -4,7 +4,6 @@
 [![Version](https://img.shields.io/npm/v/nodebb-plugin-shortcuts.svg)](https://www.npmjs.com/package/nodebb-plugin-shortcuts)
 [![Downloads](https://img.shields.io/npm/dm/nodebb-plugin-shortcuts.svg)](https://www.npmjs.com/package/nodebb-plugin-shortcuts)
 [![Dependency Status](https://david-dm.org/frissdiegurke/nodebb-plugin-shortcuts.svg)](https://david-dm.org/frissdiegurke/nodebb-plugin-shortcuts)
-[![optionalDependencies Status](https://david-dm.org/frissdiegurke/nodebb-plugin-shortcuts/optional-status.svg)](https://david-dm.org/frissdiegurke/nodebb-plugin-shortcuts#info=optionalDependencies)
 
 Adds advanced keyboard support to your NodeBB.
 
