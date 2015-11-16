@@ -23,13 +23,13 @@ define("@{type.name}/@{id}/themes/lavender/selection", ["@{type.name}/@{id}/sele
           }
         ]
       },
-      categories: {
+      categories: { // TODO check if working with sub-categories
         selector: "[component=\"categories/category\"]",
         follow: [
           function () { ajaxify.go("category/" + this.data("cid")); }
         ]
       },
-      // TODO check following actions...
+      // TODO [ check following actions (and update to component-notation)...
       recent_topics: {
         selector: "#recent_topics>li",
         follow: [
@@ -80,6 +80,7 @@ define("@{type.name}/@{id}/themes/lavender/selection", ["@{type.name}/@{id}/sele
           function () { this[0] && this[0].click(); }
         ]
       },
+      // TODO ]
       dropDowns: {
         selector: "[data-toggle=\"dropdown\"]:not([disabled])",
         getArea: function () {
