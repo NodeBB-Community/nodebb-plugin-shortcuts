@@ -13,74 +13,75 @@ define("@{type.name}/@{id}/themes/lavender/selection", ["@{type.name}/@{id}/sele
         selector: "[component=\"category/topic\"]",
         follow: [
           function () {
-            var $link = $(".replies > a[href*=\"/topic/\"]", this);
+            var $link = this.find(".replies > a[href*=\"/topic/\"]");
             if (!$link.length) { $link = $("[component=\"topic/header\"],.topic-title", this); }
-            if ($link.length) { ajaxify.go($link.attr("href")); }
+            if ($link.length) { $link[0].click(); }
           },
           function () {
-            var $link = $("[component=\"topic/header\"],.topic-title", this);
-            if ($link.length) { ajaxify.go($link.attr("href")); }
+            var $link = this.find("[component=\"topic/header\"],.topic-title");
+            if ($link.length) { $link[0].click(); }
           }
         ]
       },
-      categories: { // TODO check if working with sub-categories
-        selector: "[component=\"categories/category\"]",
+      categories: {
+        selector: "[component=\"categories/category\"], .subcategories>[data-cid]",
         follow: [
           function () { ajaxify.go("category/" + this.data("cid")); }
-        ]
-      },
-      // TODO [ check following actions (and update to component-notation)...
-      recent_topics: {
-        selector: "#recent_topics>li",
-        follow: [
-          function () {
-            var url = $("a[href^=\"/topic/\"]", this).last().attr("href");
-            ajaxify.go(url == null ? null : url.substring(1));
-          }
-        ]
+        ],
+        getClassElement: function () { return $(".category-icon", this); }
       },
       notifications: {
-        selector: "[data-nid]",
+        selector: ".notifications-list>[data-nid]",
         follow: [
-          function () { this.click(); }
+          function () {
+            var $link = this.find("a");
+            if ($link.length) { $link[0].click(); }
+          }
         ]
       },
       users: {
         selector: ".users-container>li",
         follow: [
           function () {
-            var url = $("a[href^=\"/user/\"]", this).attr("href");
-            ajaxify.go(url == null ? null : url.substring(1));
+            var $link = this.find("a[href*=\"/user/\"]");
+            if ($link.length) { $link[0].click(); }
           }
         ]
       },
       groups: {
-        selector: "#groups-list>div",
+        selector: "[component=\"groups/summary\"]",
         getClassElement: function () { return this.children().eq(0); },
         follow: [
           function () {
-            var heading = $(".panel-heading", this)[0];
-            heading && heading.click();
+            var $link = this.find(".panel-heading");
+            if ($link.length) { $link[0].click(); }
           }
         ]
       },
       tags: {
-        selector: "h3 > a[href*=\"/tags/\"]",
-        getArea: function () { return new Area(this.parent().parent()); },
+        selector: ".tag-list>.tag-container",
         follow: [
-          function () { this[0] && this[0].click(); }
+          function () {
+            var $link = this.find(">a");
+            if ($link.length) { $link[0].click(); }
+          }
+        ],
+        getClassElement: function () { return this.find(".tag-item,.tag-topic-count"); }
+      },
+      chats_recent: {
+        selector: "[component=\"chat/recent\"]>li",
+        getClassElement: function () { return this.find(".user-icon,.username"); },
+        follow: [
+          function () { this[0].click(); }
         ]
       },
-      chats: {
-        selector: "ul.chats-list.recent-chats > li",
-        getClassElement: function () {
-          return $("span", this);
-        },
+      chats_contacts: {
+        selector: "[component=\"chat/contacts\"]>li",
+        getClassElement: function () { return this.find(".user-icon,.username"); },
         follow: [
-          function () { this[0] && this[0].click(); }
+          function () { this[0].click(); }
         ]
       },
-      // TODO ]
       dropDowns: {
         selector: "[data-toggle=\"dropdown\"]:not([disabled])",
         getArea: function () {
