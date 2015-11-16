@@ -93,7 +93,7 @@ define("@{type.name}/@{id}/themes/lavender/selection", ["@{type.name}/@{id}/sele
           if (this.parent().is("#header-menu *")) { return false; }
           var area = new Area(this.parent());
           area.setHooks({
-            selector: ">ul>li:not(.divider)",
+            selector: ">ul>li:not(.divider,.dropdown-header)",
             focus: theme.selection.dropDowns.focus,
             blur: theme.selection.dropDowns.blur,
             follow: theme.selection.dropDowns.follow
