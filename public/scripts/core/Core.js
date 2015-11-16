@@ -27,7 +27,7 @@ define("@{type.name}/@{id}/Core", [
   /*-------------------------------------------- bindings initialization  --------------------------------------------*/
 
   Shortcuts.prototype.addKeyAction = function (keyAction) {
-    debug.log("addKeyAction", keyAction);
+    debug.log(" ", "addKeyAction", keyAction);
     this.bindings.push(keyAction);
     if (this.actions.hasOwnProperty(keyAction.action)) { this.actions[keyAction.action].bindings.push(keyAction); }
   };
@@ -67,9 +67,6 @@ define("@{type.name}/@{id}/Core", [
       var key;
       event = event || window.event;
       key = event.which = event.which || event.keyCode || event.key;
-      if (debug.enabled) { // don't calculate logging string if disabled enyways
-        debug._log("Key Down: " + (event.ctrlKey ? "C-" : "") + (event.altKey ? "A-" : "") + (event.shiftKey ? "S-" : "") + (event.metaKey ? "M-" : "") + key);
-      }
       self.handleEvent(event, key);
     });
     $doc.keyup(function () { self.released(); });
@@ -93,7 +90,6 @@ define("@{type.name}/@{id}/Core", [
   };
 
   Shortcuts.prototype.setAction = function (name, cb) {
-    debug.log("setAction", name);
     var bindings = [];
     for (var i = 0; i < this.bindings.length; i++) {
       if (this.bindings[i].action === name) { bindings.push(this.bindings[i]); }
@@ -143,12 +139,15 @@ define("@{type.name}/@{id}/Core", [
   Shortcuts.prototype.released = function () { this.lastTriggered.time = 0; };
 
   Shortcuts.prototype.handleEvent = function (evt, key) {
+    if (debug.enabled) { // don't calculate logging string if disabled enyways
+      debug._log("Key Down: " + (evt.ctrlKey ? "C-" : "") + (evt.altKey ? "A-" : "") + (evt.shiftKey ? "S-" : "") + (evt.metaKey ? "M-" : "") + key);
+    }
     if (this.theme == null) { return; }
     var isInput = !!~inputFields.indexOf(evt.target.tagName);
     var matchingList = [];
     var actionScopes = this.theme.scopes.getCurrent();
     var i, j;
-    debug.log("Scopes matching event-target", actionScopes);
+    debug.log(" ", "Scopes matching event-target", actionScopes);
 
     // collect all matching keyActions
     var keyAction;
@@ -170,7 +169,7 @@ define("@{type.name}/@{id}/Core", [
       // log actions to be triggered if debugging is enabled
       if (debug.enabled) {
         var actions = $.map(matchingList, function (el) { return el.keyAction.action; });
-        debug._log("[" + actions.join(", ") + "] match the event.");
+        debug._log(" ", "[" + actions.join(", ") + "] match the event.");
       }
       var now = $.now();
       // trigger actions
@@ -183,12 +182,11 @@ define("@{type.name}/@{id}/Core", [
         if (this.trigger(keyAction.action, evt) !== false) {
           this.lastTriggered.keyAction = keyAction;
           this.lastTriggered.time = now;
+          debug.log(" ", keyAction.action, "stops further handling");
           return;
         }
       }
     }
-
-    debug.log("No action got triggered");
   };
 
   Shortcuts.prototype.trigger = function (actionName, evt) {
@@ -204,7 +202,7 @@ define("@{type.name}/@{id}/Core", [
             evt.stopPropagation();
           }
         }
-        debug.log("action got triggered", actionName, result);
+        debug.log(" ", actionName, "got triggered and returned", result);
         return result;
       }
     }

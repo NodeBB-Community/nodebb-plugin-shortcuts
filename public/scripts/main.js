@@ -12,6 +12,8 @@ define("@{type.name}/@{id}/main", ["@{type.name}/@{id}/debug", "@{type.name}/@{i
     var settings = data.settings;
     var $doc = $(document);
 
+    debug.log("Settings", settings);
+
     $doc.ready(function () {
       // apply styles to document
       var styles = ".@{id}-selection { box-shadow:0 0 5px 1px " + settings.selectionColor + " !important; }";
