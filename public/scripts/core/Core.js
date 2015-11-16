@@ -220,7 +220,9 @@ define("@{type.name}/@{id}/Core", [
       }
       return;
     }
-    var $title = $("<div>NodeBB @{nbbpm.name} <small>" + module.version + "</small></div>");
+    var $title = $("<div>NodeBB @{nbbpm.name} <small>" +
+        module.version +
+        "</small> / [[@{id}:settings.actions]]</div>");
     var $body = this.getHelpBlock(id);
     require(["translator"], function (translator) {
       translator.translate($body.html(), function (result) {
@@ -237,7 +239,6 @@ define("@{type.name}/@{id}/Core", [
 
   Shortcuts.prototype.getHelpBlock = function (id) {
     var $block = $("<div id=\"" + id + "\"></div>");
-    $block.append("<h5>[[@{id}:settings.actions]]</h5>");
     var $scopeBlock = $(), $bindingsBlock = $();
     var bindings, lastScope = null, currentScope, i, dKey;
     for (var key in this.actions) {
