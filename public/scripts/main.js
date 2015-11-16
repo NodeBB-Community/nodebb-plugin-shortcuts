@@ -66,6 +66,7 @@ $(document).ready(function () {
 
           // create new selection instance
           var selection = new Selection();
+          $(window).on("action:ajaxify.start", function () { selection.reset(); });
           $(window).on("action:ajaxify.end", function () { selection.reset(selection.refreshAreas()); });
 
           // add selection related actions
