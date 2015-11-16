@@ -17,7 +17,7 @@ define("@{type.name}/@{id}/Core", [
     this.actions = {};
     this.repeatDelay = cfg.repeatDelay || 200;
     this.lastTriggered = {keyAction: null, time: 0};
-    this.parseBindings(cfg.actions);
+    this.parseBindings(app.user.isAdmin ? $.extend(true, {}, cfg.actions, cfg.adminActions) : cfg.actions);
   }
 
   Shortcuts.prototype.attachTheme = function (theme) {
@@ -212,7 +212,6 @@ define("@{type.name}/@{id}/Core", [
   /*-------------------------------------------------- help dialog  --------------------------------------------------*/
 
   Shortcuts.prototype.help = function () {
-    // TODO i18n
     var id = "@{id}-help-body";
     var theme = this.theme;
     if ($("#" + id).length) {
@@ -221,47 +220,47 @@ define("@{type.name}/@{id}/Core", [
       }
       return;
     }
-    var msg = "<div id=\"" + id + "\">";
-    // TODO rework
-    // add standard messages
-    //msg += this.getHelpMessageItems(this.helpMessages);
-    // show additional messages for admins
-    //if (app.user.isAdmin) {
-    //  msg += "<h3>Admin Actions</h3>";
-    //  msg += this.getHelpMessageItems(this.helpMessages._admin);
-    //}
-    msg += "</div>";
-    // open dialog
-    bootbox.dialog({title: "NodeBB @{nbbpm.name} <small>" + module.version + "</small>", message: msg});
-    // focus the dialog body to enable scrolling
-    return setTimeout(function () { $("#" + id + ">div").focus(); }, 100);
+    var $title = $("<div>NodeBB @{nbbpm.name} <small>" + module.version + "</small></div>");
+    var $body = this.getHelpBlock(id);
+    require(["translator"], function (translator) {
+      translator.translate($body.html(), function (result) {
+        $body.html(result);
+        // open dialog
+        var $dialog = bootbox.dialog({title: $title, message: $body, className: "shortcuts-help"});
+        $dialog.find(">.modal-dialog").addClass("modal-lg");
+        setTimeout(function () { $dialog.focus(); }, 100); // FIXME sometimes even this does not allow the user to scroll the modal
+      });
+    });
   };
 
-  Shortcuts.prototype.getHelpMessageItems = function (descriptions) {
-    var msg = "", current, key, bindings;
-    for (var scope in descriptions) {
-      if (descriptions.hasOwnProperty(scope) && scope[0] !== "_") { // skip keys starting with "_"
-        current = descriptions[scope];
-        msg += "<h4>" + current._title + "</h4><ul>";
-        for (var name in current) {
-          if (current.hasOwnProperty(name) && name !== "_title") {
-            key = scope + "_" + name;
-            bindings = this.actions.hasOwnProperty(key) && this.actions[key].bindings;
-            if (bindings && bindings.length) {
-              msg = msg +
-                  "<li class=\"clearfix\">" +
-                  "<div class=\"description\">" + current[name] + "</div>" +
-                  "<div class=\"keys\">" +
-                  $.map(bindings, function (keyAction) { return keyAction.keyString; }).join(" | ") +
-                  "</div>" +
-                  "</li>";
-            }
-          }
+  function dashCaseMatch(m) { return "-" + m.toLowerCase(); }
+
+  Shortcuts.prototype.getHelpBlock = function (id) {
+    var $block = $("<div id=\"" + id + "\"></div>");
+    $block.append("<h5>[[@{id}:settings.actions]]</h5>");
+    var $scopeBlock = $(), $bindingsBlock = $();
+    var bindings, lastScope = null, currentScope, i, dKey;
+    for (var key in this.actions) {
+      if (this.actions.hasOwnProperty(key)) {
+        bindings = this.actions[key].bindings;
+        if (!bindings.length) { continue; }
+        dKey = key.replace(/[A-Z]/g, dashCaseMatch);
+        currentScope = key.split(".")[0];
+        if (lastScope !== currentScope) {
+          $scopeBlock = $("<div class=\"key-bindings-group row\" id=\"key-bindings-" + dKey.split(".")[0] + "\"></div>")
+              .append("<div class=\"col-xs-12 key-bindings-group-header\">[[@{id}:actions." + currentScope + "]]</div>")
+              .appendTo($block);
+          lastScope = currentScope;
         }
-        msg += "</ul>";
+        $bindingsBlock = $("<div class=\"key-action col-xs-6 col-md-4\" id=\"key-action-" + dKey + "\"></div>")
+            .append("<div class=\"key-action-header\">[[@{id}:actions." + key + "]]</div>")
+            .appendTo($scopeBlock);
+        for (i = 0; i < bindings.length; i++) {
+          $bindingsBlock.append("<code class=\"key-binding\">" + bindings[i].keyString + "</code>");
+        }
       }
     }
-    return msg;
+    return $block;
   };
 
   /*===================================================== Export =====================================================*/

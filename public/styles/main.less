@@ -1,0 +1,36 @@
+.shortcuts-help {
+  h5 {
+    display: block;
+    margin-top: 0;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 1.5em;
+  }
+  .key-bindings-group-header {
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 1.1em;
+    border-bottom: 1px solid fade(@text-color, 15%);
+    background-color: fade(@brand-primary, 10%);
+    padding-bottom: @padding-base-vertical;
+    padding-top: @padding-base-vertical;
+    margin-bottom: @padding-base-vertical;
+  }
+  //.key-action-header {
+  //}
+
+  .key-bindings-group {
+    background-color: fade(@brand-primary, 10%);
+    margin-bottom: @padding-large-vertical;
+    padding-bottom: @padding-base-vertical;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    code.key-binding {
+      display: block;
+      margin: 1px @padding-large-horizontal;
+    }
+  }
+}
