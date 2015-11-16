@@ -1,6 +1,6 @@
 "use strict";
 
-// define module to keep the main instance of Core
+// define module to provide main instance of Core (e.g. for other plugins to extend actions, etc.)
 define("@{type.name}/@{id}/main", ["@{type.name}/@{id}/debug", "@{type.name}/@{id}/Core"], function (debug, Core) {
   var defer = $.Deferred();
 
@@ -15,6 +15,7 @@ define("@{type.name}/@{id}/main", ["@{type.name}/@{id}/debug", "@{type.name}/@{i
     debug.log("Settings", settings);
 
     $doc.ready(function () {
+      if (app.inAdmin) { return defer.reject("@{nbbpm.name} is deactivated for Admin CP."); }
       // apply styles to document
       var styles = ".@{id}-selection { box-shadow:0 0 5px 1px " + settings.selectionColor + " !important; }";
       $("<style type=\"text/css\">" + styles + "</style>").appendTo("head");
@@ -29,70 +30,74 @@ define("@{type.name}/@{id}/main", ["@{type.name}/@{id}/debug", "@{type.name}/@{i
   return defer;
 });
 
-require([
-          "@{type.name}/@{id}/debug",
-          "@{type.name}/@{id}/main",
-          "@{type.name}/@{id}/theme",
-          "@{type.name}/@{id}/selection/Selection",
-          "@{type.name}/@{id}/theme-defaults"
-        ], function (debug, shortcuts, theme, Selection, themeDefaults) {
-  shortcuts.done(function (shortcuts) {
-    // resolve theme module
-    var SUPPORTED_THEMES = ["lavender", "persona"];
-    var themeID = config["theme:id"].substring("nodebb-theme-".length);
+$(document).ready(function () {
+  if (app.inAdmin) { return; }
 
-    if (~SUPPORTED_THEMES.indexOf(themeID)) {
-      debug.log("Theme detected.", themeID);
+  require([
+    "@{type.name}/@{id}/debug",
+    "@{type.name}/@{id}/main",
+    "@{type.name}/@{id}/theme",
+    "@{type.name}/@{id}/selection/Selection",
+    "@{type.name}/@{id}/theme-defaults"
+  ], function (debug, shortcuts, theme, Selection, themeDefaults) {
+    shortcuts.done(function (shortcuts) {
+      // resolve theme module
+      var SUPPORTED_THEMES = ["lavender", "persona"];
+      var themeID = config["theme:id"].substring("nodebb-theme-".length);
 
-      require(["@{type.name}/@{id}/themes/" + themeID + "/main"], function (theme) {
-        // add theme related actions
-        var result = {};
-        themeDefaults(shortcuts, result);
-        theme(shortcuts, result);
+      if (~SUPPORTED_THEMES.indexOf(themeID)) {
+        debug.log("Theme detected.", themeID);
 
-        var itemSelectorsJoined = "";
-        for (var key in result.selection) {
-          if (result.selection.hasOwnProperty(key)) {
-            itemSelectorsJoined += (result.selection[key].selector += ":visible") + ",";
+        require(["@{type.name}/@{id}/themes/" + themeID + "/main"], function (theme) {
+          // add theme related actions
+          var result = {};
+          themeDefaults(shortcuts, result);
+          theme(shortcuts, result);
+
+          var itemSelectorsJoined = "";
+          for (var key in result.selection) {
+            if (result.selection.hasOwnProperty(key)) {
+              itemSelectorsJoined += (result.selection[key].selector += ":visible") + ",";
+            }
           }
-        }
-        result.itemSelectorsJoined = itemSelectorsJoined.substring(0, itemSelectorsJoined.length - 1);
+          result.itemSelectorsJoined = itemSelectorsJoined.substring(0, itemSelectorsJoined.length - 1);
 
-        shortcuts.attachTheme(result);
+          shortcuts.attachTheme(result);
 
-        // create new selection instance
-        var selection = new Selection();
-        $(window).on("action:ajaxify.end", function () { selection.reset(selection.refreshAreas()); });
+          // create new selection instance
+          var selection = new Selection();
+          $(window).on("action:ajaxify.end", function () { selection.reset(selection.refreshAreas()); });
 
-        // add selection related actions
-        //noinspection JSUnusedGlobalSymbols
-        shortcuts.mergeActions(
-            {
-              selection: {
-                release: function () { return selection.deselect(); },
-                follow: function () { return selection.triggerAction(0); },
-                highlight: function () { return selection.highlight(); },
-                item: {
-                  next: function () {
-                    return selection.active.area == null ? selection.selectNextArea(0) : selection.selectNextItem(1);
+          // add selection related actions
+          //noinspection JSUnusedGlobalSymbols
+          shortcuts.mergeActions(
+              {
+                selection: {
+                  release: function () { return selection.deselect(); },
+                  follow: function () { return selection.triggerAction(0); },
+                  highlight: function () { return selection.highlight(); },
+                  item: {
+                    next: function () {
+                      return selection.active.area == null ? selection.selectNextArea(0) : selection.selectNextItem(1);
+                    },
+                    prev: function () {
+                      return selection.active.area == null ? selection.selectNextArea(0) : selection.selectNextItem(-1);
+                    }
                   },
-                  prev: function () {
-                    return selection.active.area == null ? selection.selectNextArea(0) : selection.selectNextItem(-1);
+                  area: {
+                    next: function () { return selection.selectNextArea(1); },
+                    prev: function () { return selection.selectNextArea(-1); }
                   }
-                },
-                area: {
-                  next: function () { return selection.selectNextArea(1); },
-                  prev: function () { return selection.selectNextArea(-1); }
                 }
               }
-            }
-        );
-        shortcuts.prependToAction("body.focus", function () { return selection.deselect(); });
+          );
+          shortcuts.prependToAction("body.focus", function () { return selection.deselect(); });
 
-        selection.attachTheme(result);
-      });
-    } else {
-      debug.error("Theme not supported.", themeID);
-    }
+          selection.attachTheme(result);
+        });
+      } else {
+        debug.error("Theme not supported.", themeID);
+      }
+    });
   });
 });
