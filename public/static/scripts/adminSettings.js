@@ -72,7 +72,7 @@
       }
 
       addFields($actionsWrapper, defaultSettings._.actions, "actions");
-      addFields($adminActionsWrapper, defaultSettings._.adminActions, "adminActions");
+      addFields($adminActionsWrapper, defaultSettings._.adminActions, "actions");
 
       /*========================================= Handle settings and buttons  =========================================*/
 
