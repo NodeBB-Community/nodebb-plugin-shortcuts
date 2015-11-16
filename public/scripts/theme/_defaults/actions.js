@@ -10,8 +10,8 @@ define("@{type.name}/@{id}/theme-defaults/actions", function () {
               theme.utils.blurFocus();
             },
             scroll: {
-              pageDown: function () { theme.utils.scroll.verticalPages(1); },
-              pageUp: function () { theme.utils.scroll.verticalPages(-1); },
+              pageDown: function () { theme.utils.scroll.verticalPages(0.92); },
+              pageUp: function () { theme.utils.scroll.verticalPages(-0.92); },
               top: function () { theme.utils.scroll.verticalAbsolute(0); },
               bottom: function () { theme.utils.scroll.verticalAbsolute(1); }
             },

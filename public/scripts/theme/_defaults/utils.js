@@ -12,7 +12,7 @@ define("@{type.name}/@{id}/theme-defaults/utils", function () {
           var element = theme.dialogs.getOpened().parent();
           var elementHeight;
           if (element.length) {
-            elementHeight = element.parent().height();
+            elementHeight = element.height();
             element = element[0];
           } else {
             element = document.body;
