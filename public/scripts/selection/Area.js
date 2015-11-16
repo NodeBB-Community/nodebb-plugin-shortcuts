@@ -10,7 +10,7 @@ define("@{type.name}/@{id}/selection/Area", function () {
    */
   function Area($parent) {
     this.parent = $parent == null ? NO_ELEMENT : $parent;
-    this.hooks = {};
+    this.hooks = null;
     this.items = null;
     this.index = 0;
   }

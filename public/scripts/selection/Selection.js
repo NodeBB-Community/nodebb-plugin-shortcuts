@@ -160,7 +160,7 @@ define("@{type.name}/@{id}/selection/Selection", ["@{type.name}/@{id}/selection/
     var areas = [], items = [];
     // iterate all relevant elements
     $(theme.itemSelectorsJoined).each(function (ignored, item) {
-      if (items.indexOf(item) >= 0) { return; } // each item may only resolve to one area
+      if (~items.indexOf(item)) { return; } // each item may only resolve to one area
       var $item = $(item);
       var area = null;
       for (var key in theme.selection) {
@@ -171,7 +171,8 @@ define("@{type.name}/@{id}/selection/Selection", ["@{type.name}/@{id}/selection/
             area = typeof value.getArea === "function" ? value.getArea.call($item) : null;
             if (area === false) { return; }
             if (area == null) { area = new Area($item.parent()); }
-            if (area.items == null) { area.refreshItems(value); }
+            if (area.hooks == null) { area.setHooks(value); }
+            if (area.items == null) { area.refreshItems(); }
             break;
           }
         }
