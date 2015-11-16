@@ -85,7 +85,7 @@ define("@{type.name}/@{id}/theme-defaults/utils", function () {
       },
 
       formElements: {
-        getVisible: function () { return $(".form-control,input,.btn").not("button,[disabled]").filter(":visible"); },
+        getVisible: function () { return $(".form-control,input,.btn").not("button,[disabled],:hidden,.hidden *"); },
         getRelativeToFocused: function (step) {
           if (step == null) { step = 1; }
           var $formEl = theme.utils.formElements.getVisible();

@@ -92,12 +92,12 @@ define("@{type.name}/@{id}/themes/lavender/selection", ["@{type.name}/@{id}/sele
         getArea: function () {
           if (this.parent().is("#header-menu *")) { return false; }
           var area = new Area(this.parent());
-          area.refreshItems({
-                              selector: ">ul>li:not(.divider)",
-                              focus: theme.selection.dropDowns.focus,
-                              blur: theme.selection.dropDowns.blur,
-                              follow: theme.selection.dropDowns.follow
-                            });
+          area.setHooks({
+            selector: ">ul>li:not(.divider)",
+            focus: theme.selection.dropDowns.focus,
+            blur: theme.selection.dropDowns.blur,
+            follow: theme.selection.dropDowns.follow
+          });
           return area;
         },
         focus: {
@@ -117,7 +117,7 @@ define("@{type.name}/@{id}/themes/lavender/selection", ["@{type.name}/@{id}/sele
           }
         },
         follow: [
-          function () { $(">*", this).focus().click(); }
+          function () { $(">*", this).focus()[0].click(); }
         ]
       }
     };

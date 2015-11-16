@@ -15,9 +15,12 @@ define("@{type.name}/@{id}/selection/Area", function () {
     this.index = 0;
   }
 
-  Area.prototype.refreshItems = function (hooks) {
+  Area.prototype.setHooks = function (hooks) {
     this.hooks = hooks == null ? this.hooks : hooks;
-    this.items = $(this.hooks.selector, this.parent);
+  };
+
+  Area.prototype.refreshItems = function () {
+    this.items = this.parent.find(this.hooks.selector);
     if (!this.items.length) {
       this.items = this.parent.children(this.hooks.selector);
     }

@@ -177,8 +177,10 @@ define("@{type.name}/@{id}/selection/Selection", ["@{type.name}/@{id}/selection/
         }
       }
       // track items and area
-      area.items.each(function (ignored, elem) { items.push(elem); });
-      areas.push(area);
+      if (area != null) {
+        area.items.each(function (ignored, elem) { items.push(elem); });
+        areas.push(area);
+      }
     });
     return areas;
   };
@@ -189,16 +191,20 @@ define("@{type.name}/@{id}/selection/Selection", ["@{type.name}/@{id}/selection/
    @returns Boolean Whether anything changed.
    */
   Selection.prototype.selectArea = function (index) {
+    if (index === this.index) { return false; }
+    // FIXME dropdown scroll does only ensure first item visible
+
     var area = this.areas[index], oldArea = this.active.area;
-    // FIXME scroll doesn't work correct if change to dropdown-area with index > 0 selected because hooks.focus.area() after scroll
-    if (!(area && area.items && area.items.length) || index === this.index || this.selectItem(area.index, index) === false) {
-      return false;
-    }
+
     if (oldArea && oldArea.hooks && oldArea.hooks.blur && typeof oldArea.hooks.blur.area === "function") {
       oldArea.hooks.blur.area.call(oldArea, area);
     }
-    if (area.hooks.focus && typeof area.hooks.focus.area === "function") { area.hooks.focus.area.call(area, oldArea); }
-    return true;
+    if (area.hooks.focus && typeof area.hooks.focus.area === "function") {
+      area.hooks.focus.area.call(area, oldArea);
+    }
+    area.refreshItems();
+
+    return this.selectItem(area.index, index) !== false;
   };
 
   /**

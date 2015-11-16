@@ -22,7 +22,7 @@
                        });
     }
 
-    require(["settings", "translator"], function (settings, translator) {
+    require(["@{type.name}/@{id}/debug", "settings", "translator"], function (debug, settings, translator) {
 
       /*======================================= Dynamically insert action inputs =======================================*/
 
@@ -81,7 +81,10 @@
 
       $wrapper.find("." + moduleId + "-settings-save").click(function (event) {
         event.preventDefault();
-        settings.persist(moduleId, $wrapper, function () { socket.emit("admin.settings.sync@{Id}"); });
+        settings.persist(moduleId, $wrapper, function () {
+          if (debug.enabled) { debug._log(moduleId, settings.cfg._); }
+          socket.emit("admin.settings.sync@{Id}");
+        });
       }).removeAttr("disabled");
 
       $wrapper.find("." + moduleId + "-settings-reset").click(function (event) {

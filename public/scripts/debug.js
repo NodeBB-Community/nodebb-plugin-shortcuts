@@ -2,18 +2,17 @@
 
 define("@{type.name}/@{id}/debug", function () {
   var __slice = Array.prototype.slice;
-  var env = "@{env}";
-  var debug = env === "development";
+  var env = "@{env}", dbg = (env === "development");
 
   var exports = {
-    enabled: debug,
+    enabled: dbg,
     _log: function () {
       var args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
       console.log.apply(console, ["@{name} DEBUG -"].concat(__slice.call(args)));
     },
     log: function () {
       var args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-      if (debug) { exports._log.apply(null, args); }
+      if (dbg) { exports._log.apply(null, args); }
     },
     error: function () {
       console.error.apply(console, ["@{name} ERROR -"].concat(__slice.call(arguments)));

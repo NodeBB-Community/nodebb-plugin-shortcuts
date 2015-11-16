@@ -77,7 +77,7 @@ define("@{type.name}/@{id}/Core", [
     $doc.keypress(function (event) {
       var key;
       event = event || window.event;
-      if (~inputFields.indexOf(event.target.tagName)) {
+      if (!~inputFields.indexOf($(event.target).prop("tagName"))) {
         key = event.which || event.keyCode || event.key;
         if (key === keyCodes.questionMark) { self.help(); }
       }
@@ -224,6 +224,7 @@ define("@{type.name}/@{id}/Core", [
       return;
     }
     var msg = "<div id=\"" + id + "\">";
+    // TODO rework
     // add standard messages
     //msg += this.getHelpMessageItems(this.helpMessages);
     // show additional messages for admins

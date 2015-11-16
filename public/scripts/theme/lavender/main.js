@@ -2,9 +2,9 @@
 
 /*
  * Latest functionality approval:
- *   2015/02/04
- *   NodeBB 0.6.0
- *   nodebb-theme-lavender 0.2.13
+ *   2015/11/16
+ *   NodeBB 0.9.0
+ *   nodebb-theme-lavender 3.0.0
  */
 
 define("@{type.name}/@{id}/themes/lavender/main", [

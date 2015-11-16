@@ -16,7 +16,17 @@ define("@{type.name}/@{id}/theme-defaults", [
           return $(el).height();
         });
       },
-      close: function (el) { $(".bootbox-close-button", el).click(); } // TODO figure out better way
+      close: function (dialog) { return $(".bootbox-close-button", dialog).click().length > 0; },
+      cancel: function (dialog) { return $("[data-bb-handler=\"cancel\"]", dialog).click().length > 0; },
+      confirm: function (dialog) {
+        var $confirm = $("[data-bb-handler=\"confirm\"]", dialog);
+        if ($confirm.length) {
+          $confirm.click();
+        } else {
+          $confirm = $("[data-bb-handler=\"ok\"]", dialog);
+          return $confirm.click().length;
+        }
+      }
     };
 
     theme.composer = {

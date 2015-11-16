@@ -6,7 +6,7 @@ define("@{type.name}/@{id}/theme-defaults/actions", function () {
         {
           body: {
             focus: function () {
-              $(".open>.dropdown-toggle").click();
+              $(".open>[data-toggle=\"dropdown\"]").click();
               theme.utils.blurFocus();
             },
             scroll: {
@@ -43,6 +43,7 @@ define("@{type.name}/@{id}/theme-defaults/actions", function () {
 
           header: {
             home: function () { ajaxify.go(""); },
+            categories: function () { ajaxify.go("categories"); },
             unread: function () { ajaxify.go("unread"); },
             recent: function () { ajaxify.go("recent"); },
             tags: function () { ajaxify.go("tags"); },
@@ -50,21 +51,17 @@ define("@{type.name}/@{id}/theme-defaults/actions", function () {
             users: function () { ajaxify.go("users"); },
             groups: function () { ajaxify.go("groups"); },
             notifications: function () { ajaxify.go("notifications"); },
-            profile: function () { ajaxify.go("user/" + app.username); },
+            profile: function () { ajaxify.go("user/" + app.user.username); },
             search: function () { return $("#search-button").click().length > 0; },
-            chats: function () { $("#chat_dropdown").click(); },
+            chats: function () { ajaxify.go("chats"); },
             admin: function () {
-              if (app.user.isAdmin) {
-                location.pathname = RELATIVE_PATH + "/admin";
-              } else {
-                return false;
-              }
+              if (app.user.isAdmin) { location.pathname = RELATIVE_PATH + "/admin"; } else { return false; }
             }
           },
 
           navPills: {
             next: function () {
-              var $pills = $(">li", $(".nav-pills")[0]).not(".hide");
+              var $pills = $(".nav-pills").eq(0).find(">li").not(".hide,.hidden");
               if ($pills.css("float") === "right") {
                 theme.utils.navPills.prev($pills);
               } else {
@@ -72,7 +69,7 @@ define("@{type.name}/@{id}/theme-defaults/actions", function () {
               }
             },
             prev: function () {
-              var $pills = $(">li", $(".nav-pills")[0]).not(".hide");
+              var $pills = $(".nav-pills").eq(0).find(">li").not(".hide,.hidden");
               if ($pills.css("float") === "right") {
                 theme.utils.navPills.next($pills);
               } else {
@@ -83,32 +80,15 @@ define("@{type.name}/@{id}/theme-defaults/actions", function () {
 
           breadcrumb: {
             up: function () {
-              var breadcrumb = $("> a", $(".breadcrumb li.active").prev())[0];
+              var breadcrumb = $(".breadcrumb li.active").prev().find(">a")[0];
               if (breadcrumb == null) { return false; }
               breadcrumb.click();
             }
           },
 
-          category: {
-            newTopic: function () {
-              var newTopic = $("#new_post")[0];
-              if (newTopic == null) { return false; }
-              newTopic.click();
-            }
-          },
+          category: {newTopic: function () { return $("#new_topic").click().length > 0; }},
 
-          topic: {
-            reply: function () {
-              var reply = $(".shortcut-selection .btn.quote")[0] || $(".post_reply").last()[0];
-              if (reply == null) { return false; }
-              reply.click();
-            },
-            threadTools: function () {
-              var threadTools = $(".thread-tools>button")[0];
-              if (threadTools == null) { return false; }
-              threadTools.click();
-            }
-          },
+          topic: {reply: function () { return $("[component=\"topic/reply\"]").first().click().length > 0; }},
 
           composer: {
             send: function () { $("button[data-action=\"post\"]", theme.composer.getActive())[0].click(); },
@@ -128,74 +108,61 @@ define("@{type.name}/@{id}/theme-defaults/actions", function () {
               }
             },
             preview: function () {
-              var $preview = $("a[data-pane=\".tab-preview\"]", theme.composer.getActive());
-              if (!$preview.length || $preview.parent().hasClass("active")) { return false; }
-              $preview[0].click();
+              var composer = theme.composer.getActive();
+              return $(".toggle-preview:visible", composer).click().length > 0;
             },
             previewSend: function () {
               var composer = theme.composer.getActive();
-              var $preview = $("a[data-pane=\".tab-preview\"]", composer);
-              if (!$preview.length || $preview.parent().hasClass("active")) {
+              if (composer == null) { return false; }
+              var $togglePreview = $(".toggle-preview:visible", composer);
+              if ($(".preview-container:visible", composer).length || !$togglePreview.length) {
                 $("button[data-action=\"post\"]", composer)[0].click();
               } else {
-                $preview[0].click();
-              }
-            },
-            writeSend: function () {
-              var composer = theme.composer.getActive();
-              var $write = $("a[data-pane=\".tab-write\"]", composer);
-              if (!$write.length || $write.parent().hasClass("active")) {
-                $("button[data-action=\"post\"]", composer)[0].click();
-              } else {
-                $write[0].click();
+                return $togglePreview.click().length > 0;
               }
             },
             help: function () {
-              var $help = $("a[data-pane=\".tab-help\"]", theme.composer.getActive());
-              if ($help.length) {
-                if ($help.parent().hasClass("active")) { return false; }
-                $help[0].click();
-              } else {
-                $help = $(".help", theme.composer.getActive());
-                if (!$help.length) { return false; }
-                $help.click();
-              }
+              var composer = theme.composer.getActive();
+              if (composer == null) { return false; }
+              $(".help", composer).click();
             },
             write: function () {
               var composer = theme.composer.getActive();
-              var $write = $("a[data-pane=\".tab-write\"]", composer);
-              if (!$write.length || $write.parent().hasClass("active")) {
-                $(".write", composer).focus();
-                return false;
-              }
-              $write[0].click();
+              return $(".write", composer).focus().length > 0;
             },
-            bold: function () { $(".formatting-bar .fa-bold", theme.composer.getActive())[0].click(); },
-            italic: function () { $(".formatting-bar .fa-italic", theme.composer.getActive())[0].click(); },
-            list: function () { $(".formatting-bar .fa-list", theme.composer.getActive())[0].click(); },
-            link: function () { $(".formatting-bar .fa-link", theme.composer.getActive())[0].click(); }
+            bold: function () {
+              return $(".formatting-bar [data-format=\"bold\"]", theme.composer.getActive()).click().length > 0;
+            },
+            italic: function () {
+              return $(".formatting-bar [data-format=\"italic\"]", theme.composer.getActive()).click().length > 0;
+            },
+            list: function () {
+              return $(".formatting-bar [data-format=\"list\"]", theme.composer.getActive()).click().length > 0;
+            },
+            link: function () {
+              return $(".formatting-bar [data-format=\"link\"]", theme.composer.getActive()).click().length > 0;
+            }
           },
 
           dialog: {
             confirm: function () {
               var any = false;
-              theme.dialogs.getOpened().each(function (ignored, d) {
-                var confirm = $(".modal-footer>button", d)[1];
-                if (confirm != null) {
-                  any = true;
-                  confirm.click();
-                }
+              theme.dialogs.getOpened().each(function (ignored, dialog) {
+                if (theme.dialogs.confirm(dialog)) { any = true; }
+              });
+              return any;
+            },
+            cancel: function () {
+              var any = false;
+              theme.dialogs.getOpened().each(function (ignored, dialog) {
+                if (theme.dialogs.cancel(dialog)) { any = true; }
               });
               return any;
             },
             close: function () {
               var any = false;
-              theme.dialogs.getOpened().each(function (ignored, d) {
-                var close = $(".bootbox-close-button,.close", d)[1];
-                if (close != null) {
-                  any = true;
-                  close.click();
-                }
+              theme.dialogs.getOpened().each(function (ignored, dialog) {
+                if (theme.dialogs.close(dialog)) { any = true; }
               });
               return any;
             }
@@ -207,16 +174,8 @@ define("@{type.name}/@{id}/theme-defaults/actions", function () {
               if (!links.length) { return false; }
               for (var i = 0; i < links.length; i++) { links[i].click(); }
             },
-            clickFirst: function () {
-              var link = $(".taskbar li>a")[0];
-              if (link == null) { return false; }
-              link.click();
-            },
-            clickLast: function () {
-              var link = $(".taskbar li>a").last()[0];
-              if (link == null) { return false; }
-              link.click();
-            }
+            clickFirst: function () { return $(".taskbar li>a").click().length > 0; },
+            clickLast: function () { return $(".taskbar li>a").last().click().length > 0; }
           }
         }
     );
