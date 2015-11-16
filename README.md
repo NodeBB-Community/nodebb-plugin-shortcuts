@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/npm/l/nodebb-plugin-shortcuts.svg)](LICENSE)
 [![Version](https://img.shields.io/npm/v/nodebb-plugin-shortcuts.svg)](https://www.npmjs.com/package/nodebb-plugin-shortcuts)
 [![Downloads](https://img.shields.io/npm/dm/nodebb-plugin-shortcuts.svg)](https://www.npmjs.com/package/nodebb-plugin-shortcuts)
-[![Dependency Status](https://david-dm.org/frissdiegurke/nodebb-plugin-shortcuts.svg)](https://david-dm.org/frissdiegurke/nodebb-plugin-shortcuts)
+[![Dependency Status](https://david-dm.org/NodeBB-Community/nodebb-plugin-shortcuts.svg)](https://david-dm.org/NodeBB-Community/nodebb-plugin-shortcuts)
 
 Adds advanced keyboard support to your NodeBB.
 
@@ -19,4 +19,4 @@ The manual installation via [NPM](https://www.npmjs.com/) may result in version-
 
 ## Development
 
-This module gets developed using the [NodeBB Grunt](https://github.com/frissdiegurke/nodebb-grunt) Framework.
+This module gets developed using the [NodeBB Grunt](https://github.com/NodeBB-Community/nodebb-grunt) Framework.
