@@ -214,12 +214,17 @@ define("@{type.name}/@{id}/Core", [
   Shortcuts.prototype.help = function () {
     var id = "@{id}-help-body";
     var theme = this.theme;
+    var self = this;
+    if (this.helpInProgress) {
+      return;
+    }
     if ($("#" + id).length) {
       if (theme != null) {
         theme.dialogs.getOpened().each(function (i, el) { theme.dialogs.close(el); });
       }
       return;
     }
+    this.helpInProgress = true;
     var $title = $("<div>NodeBB @{nbbpm.name} <small>" +
         module.version +
         "</small> / [[@{id}:settings.actions]]</div>");
@@ -230,7 +235,10 @@ define("@{type.name}/@{id}/Core", [
         // open dialog
         var $dialog = bootbox.dialog({title: $title, message: $body, className: "shortcuts-help"});
         $dialog.find(">.modal-dialog").addClass("modal-lg");
-        setTimeout(function () { $dialog.focus(); }, 100); // FIXME sometimes even this does not allow the user to scroll the modal
+        setTimeout(function () {
+          self.helpInProgress = false;
+          $dialog.focus();
+        }, 100); // FIXME sometimes even this does not allow the user to scroll the modal
       });
     });
   };

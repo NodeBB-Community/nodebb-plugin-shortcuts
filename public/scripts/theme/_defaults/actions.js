@@ -47,7 +47,7 @@ define("@{type.name}/@{id}/theme-defaults/actions", function () {
             unread: function () { ajaxify.go("unread"); },
             recent: function () { ajaxify.go("recent"); },
             tags: function () { ajaxify.go("tags"); },
-            popular: function () { ajaxify.go("popular"); },
+            popular: function () { ajaxify.go("popular/daily"); },
             users: function () { ajaxify.go("users"); },
             groups: function () { ajaxify.go("groups"); },
             notifications: function () { ajaxify.go("notifications"); },
