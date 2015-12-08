@@ -8,6 +8,7 @@
   "scripts": ["public/scripts/"],
   "staticDirs": {"static": "public/static/"},
   "languages": "public/locales",
+  "defaultLang": "en_GB",
   "templates": "public/templates",
   "hooks": [
     {"hook": "static:app.load", "method": "init"},

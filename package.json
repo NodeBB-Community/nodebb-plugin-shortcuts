@@ -1,6 +1,6 @@
 {
   "name": "nodebb-plugin-shortcuts",
-  "version": "1.0.2+@{build}",
+  "version": "1.0.3+@{build}",
   "description": "Adds advanced keyboard support to your NodeBB.",
   "main": "lib/main.js",
   "author": "Ole Reglitzki <frissdiegurke@protonmail.com> (https://github.com/frissdiegurke)",
