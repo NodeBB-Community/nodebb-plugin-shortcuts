@@ -1,6 +1,6 @@
-"use strict";
-
 define("@{type.name}/@{id}/key-codes", function () {
+  "use strict";
+
   var mapped = {
     "": 0, "Backspace": 8, "Tab": 9, "Enter": 13, "Escape": 27, "Space": 32, "Left": 37, "Up": 38, "Right": 39,
     "Down": 40, "Insert": 45, "Delete": 46, "=": 187, "-": 189, ".": 190, "/": 191, "[": 219, "\\": 220, "]": 221

@@ -1,5 +1,3 @@
-"use strict";
-
 /*
  * This file defines a basic module that provides some information.
  *
@@ -8,6 +6,8 @@
  */
 
 define("@{type.name}/@{id}", function () {
+  "use strict";
+
   var version = "@{>version}".split("+");
 
   return {

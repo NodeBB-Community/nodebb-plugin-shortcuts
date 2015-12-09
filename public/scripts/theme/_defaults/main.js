@@ -1,10 +1,10 @@
-"use strict";
-
 define("@{type.name}/@{id}/theme-defaults", [
   "@{type.name}/@{id}/theme-defaults/utils",
   "@{type.name}/@{id}/theme-defaults/scopes",
   "@{type.name}/@{id}/theme-defaults/actions"
 ], function (defaultUtils, defaultScopes, defaultActions) {
+  "use strict";
+
   return function (shortcuts, theme) {
     defaultUtils(shortcuts, theme);
     defaultScopes(shortcuts, theme);
@@ -22,9 +22,10 @@ define("@{type.name}/@{id}/theme-defaults", [
         var $confirm = $("[data-bb-handler=\"confirm\"]", dialog);
         if ($confirm.length) {
           $confirm.click();
+          return true;
         } else {
           $confirm = $("[data-bb-handler=\"ok\"]", dialog);
-          return $confirm.click().length;
+          return $confirm.click().length > 0;
         }
       }
     };

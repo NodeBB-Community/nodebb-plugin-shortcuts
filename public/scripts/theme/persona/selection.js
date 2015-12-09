@@ -1,6 +1,6 @@
-"use strict";
-
 define("@{type.name}/@{id}/themes/persona/selection", ["@{type.name}/@{id}/selection/Area"], function (Area) {
+  "use strict";
+
   return function (shortcuts, theme) {
     theme.selection = {
       posts: {

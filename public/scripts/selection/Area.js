@@ -1,6 +1,6 @@
-"use strict";
-
 define("@{type.name}/@{id}/selection/Area", function () {
+  "use strict";
+
   var NO_ELEMENT = $();
 
   /**

@@ -1,6 +1,6 @@
-"use strict";
-
 define("@{type.name}/@{id}/KeyAction", ["@{type.name}/@{id}/key-codes"], function (keyCodes) {
+  "use strict";
+
   function convertKeyCodeToChar(code) {
     if (code >= 48 && code <= 90) {
       return String.fromCharCode(code).toUpperCase();

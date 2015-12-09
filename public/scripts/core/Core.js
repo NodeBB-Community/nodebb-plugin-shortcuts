@@ -1,5 +1,3 @@
-"use strict";
-
 define("@{type.name}/@{id}/Core", [
   "@{type.name}/@{id}/debug",
   "@{type.name}/@{id}",
@@ -7,6 +5,7 @@ define("@{type.name}/@{id}/Core", [
   "@{type.name}/@{id}/KeyAction",
   "@{type.name}/@{id}/key-codes"
 ], function (debug, module, inputFields, KeyAction, keyCodes) {
+  "use strict";
 
   /*=================================================== Core Class ===================================================*/
 
@@ -17,7 +16,8 @@ define("@{type.name}/@{id}/Core", [
     this.actions = {};
     this.repeatDelay = cfg.repeatDelay || 200;
     this.lastTriggered = {keyAction: null, time: 0};
-    this.parseBindings(app.user.isAdmin ? $.extend(true, {}, cfg.actions, cfg.adminActions) : cfg.actions);
+    var actions = app.inAdmin || app.user.isAdmin ? $.extend(true, {}, cfg.actions, cfg.adminActions) : cfg.actions;
+    this.parseBindings(actions);
   }
 
   Shortcuts.prototype.attachTheme = function (theme) {
@@ -215,9 +215,7 @@ define("@{type.name}/@{id}/Core", [
     var id = "@{id}-help-body";
     var theme = this.theme;
     var self = this;
-    if (this.helpInProgress) {
-      return;
-    }
+    if (this.helpInProgress) { return false; }
     if ($("#" + id).length) {
       if (theme != null) {
         theme.dialogs.getOpened().each(function (i, el) { theme.dialogs.close(el); });
@@ -227,7 +225,9 @@ define("@{type.name}/@{id}/Core", [
     this.helpInProgress = true;
     var $title = $("<div>NodeBB @{nbbpm.name} <small>" +
         module.version +
-        "</small> / [[@{id}:settings.actions]]</div>");
+        "</small> / [[@{id}:settings.actions]]" +
+        (app.inAdmin ? " <small>[[@{id}:settings.acp]]</small>" : "") +
+        "</div>");
     var $body = this.getHelpBlock(id);
     require(["translator"], function (translator) {
       translator.translate($body.html(), function (result) {
@@ -235,22 +235,44 @@ define("@{type.name}/@{id}/Core", [
         // open dialog
         var $dialog = bootbox.dialog({title: $title, message: $body, className: "shortcuts-help"});
         $dialog.find(">.modal-dialog").addClass("modal-lg");
-        setTimeout(function () {
+        $dialog.on("shown.bs.modal", function () {
           self.helpInProgress = false;
           $dialog.focus();
-        }, 100); // FIXME sometimes even this does not allow the user to scroll the modal
+        });
       });
     });
+    return true;
   };
 
   function dashCaseMatch(m) { return "-" + m.toLowerCase(); }
 
+  Shortcuts.prototype.expandSubActions = function (array) {
+    var result = [], pKey, pKeyDot;
+    for (var i = 0; i < array.length; i++) {
+      pKey = array[i];
+      pKeyDot = pKey + ".";
+      for (var key in this.actions) {
+        if (this.actions.hasOwnProperty(key) && (key === pKey || key.startsWith(pKeyDot))) { result.push(key); }
+      }
+    }
+    return result;
+  };
+
   Shortcuts.prototype.getHelpBlock = function (id) {
     var $block = $("<div id=\"" + id + "\"></div>");
     var $scopeBlock = $(), $bindingsBlock = $();
-    var bindings, lastScope = null, currentScope, i, dKey;
-    for (var key in this.actions) {
-      if (this.actions.hasOwnProperty(key)) {
+    var bindings, lastScope = null, currentScope, i, j, dKey;
+    var actions, ignore;
+    if (app.inAdmin) {
+      actions = this.expandSubActions(["acp", "body", "dialog"]);
+      ignore = [];
+    } else {
+      actions = Object.keys(this.actions);
+      ignore = this.expandSubActions(["acp"]);
+    }
+    for (i = 0; i < actions.length; i++) {
+      var key = actions[i];
+      if (this.actions.hasOwnProperty(key) && !~ignore.indexOf(key)) {
         bindings = this.actions[key].bindings;
         if (!bindings.length) { continue; }
         dKey = key.replace(/[A-Z]/g, dashCaseMatch);
@@ -264,8 +286,8 @@ define("@{type.name}/@{id}/Core", [
         $bindingsBlock = $("<div class=\"key-action col-xs-6 col-md-4\" id=\"key-action-" + dKey + "\"></div>")
             .append("<div class=\"key-action-header\">[[@{id}:actions." + key + "]]</div>")
             .appendTo($scopeBlock);
-        for (i = 0; i < bindings.length; i++) {
-          $bindingsBlock.append("<code class=\"key-binding\">" + bindings[i].keyString + "</code>");
+        for (j = 0; j < bindings.length; j++) {
+          $bindingsBlock.append("<code class=\"key-binding\">" + bindings[j].keyString + "</code>");
         }
       }
     }

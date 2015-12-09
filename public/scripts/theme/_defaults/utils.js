@@ -1,6 +1,6 @@
-"use strict";
-
 define("@{type.name}/@{id}/theme-defaults/utils", function () {
+  "use strict";
+
   return function (shortcuts, theme) {
     theme.utils = {
       blurFocus: function () { $("*:focus").blur(); },
@@ -9,7 +9,7 @@ define("@{type.name}/@{id}/theme-defaults/utils", function () {
 
       scroll: {
         verticalPages: function (factor) {
-          var element = theme.dialogs.getOpened().parent();
+          var element = theme.dialogs.getOpened().last().parent();
           var elementHeight;
           if (element.length) {
             elementHeight = element.height();
@@ -22,10 +22,10 @@ define("@{type.name}/@{id}/theme-defaults/utils", function () {
           return element.scrollTop += elementHeight * factor;
         },
         verticalAbsolute: function (percentage) {
-          var element = theme.dialogs.getOpened().parent();
+          var element = theme.dialogs.getOpened().last().parent();
           var value;
           if (element.length) {
-            value = percentage * (element.children()[0].offsetHeight - element.height());
+            value = percentage * (element.children().last().outerHeight(true) - element.height());
             element = element[0];
           } else {
             element = document.body;

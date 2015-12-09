@@ -1,6 +1,6 @@
-"use strict";
-
 define("@{type.name}/@{id}/debug", function () {
+  "use strict";
+
   var __slice = Array.prototype.slice;
   var env = "@{env}", dev = (env === "development");
 

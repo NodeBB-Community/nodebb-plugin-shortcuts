@@ -1,5 +1,3 @@
-"use strict";
-
 /*
  * Latest functionality approval:
  *   2015/11/16
@@ -10,5 +8,7 @@
 define("@{type.name}/@{id}/themes/lavender/main", [
   "@{type.name}/@{id}/themes/lavender/selection"
 ], function (selection) {
+  "use strict";
+
   return function (shortcuts, theme) { selection(shortcuts, theme); };
 });

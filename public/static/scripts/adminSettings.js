@@ -1,5 +1,3 @@
-"use strict";
-
 /*
  * This files gets called from the admin-page of the module to handle settings.
  *
@@ -8,6 +6,7 @@
  */
 
 (function () {
+  "use strict";
 
   var moduleId = "@{id}";
   var $wrapper = $("#" + moduleId + "-settings");

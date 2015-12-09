@@ -1,9 +1,13 @@
-"use strict";
-
 define("@{type.name}/@{id}/theme-defaults/actions", function () {
+  "use strict";
+
   return function (shortcuts, theme) {
     shortcuts.mergeActions(
         {
+          acp: {
+            home: function () { if (app.inAdmin) { location.pathname = RELATIVE_PATH; } else { return false; } }
+          },
+
           body: {
             focus: function () {
               $(".open>[data-toggle=\"dropdown\"]").click();
@@ -21,6 +25,7 @@ define("@{type.name}/@{id}/theme-defaults/actions", function () {
             },
             form: {
               next: function () {
+                if ($("input[type=\"key\"]:focus").length) { return false; }
                 var formEl = theme.utils.formElements.getRelativeToFocused(1);
                 if (formEl != null && formEl.length) {
                   formEl.focus();
@@ -30,6 +35,7 @@ define("@{type.name}/@{id}/theme-defaults/actions", function () {
                 }
               },
               prev: function () {
+                if ($("input[type=\"key\"]:focus").length) { return false; }
                 var formEl = theme.utils.formElements.getRelativeToFocused(-1);
                 if (formEl != null && formEl.length) {
                   formEl.focus();
@@ -145,27 +151,9 @@ define("@{type.name}/@{id}/theme-defaults/actions", function () {
           },
 
           dialog: {
-            confirm: function () {
-              var any = false;
-              theme.dialogs.getOpened().each(function (ignored, dialog) {
-                if (theme.dialogs.confirm(dialog)) { any = true; }
-              });
-              return any;
-            },
-            cancel: function () {
-              var any = false;
-              theme.dialogs.getOpened().each(function (ignored, dialog) {
-                if (theme.dialogs.cancel(dialog)) { any = true; }
-              });
-              return any;
-            },
-            close: function () {
-              var any = false;
-              theme.dialogs.getOpened().each(function (ignored, dialog) {
-                if (theme.dialogs.close(dialog)) { any = true; }
-              });
-              return any;
-            }
+            confirm: function () { return theme.dialogs.confirm(theme.dialogs.getOpened().last()); },
+            cancel: function () { return theme.dialogs.cancel(theme.dialogs.getOpened().last()); },
+            close: function () { return theme.dialogs.close(theme.dialogs.getOpened().last()); }
           },
 
           taskbar: {

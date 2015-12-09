@@ -1,9 +1,9 @@
-"use strict";
-
 define("@{type.name}/@{id}/selection/Selection", [
   "@{type.name}/@{id}/debug",
   "@{type.name}/@{id}/selection/Area"
 ], function (debug, Area) {
+  "use strict";
+
   var CLASS_NAMES = {selection: "@{id}-selection", highlightIn: "highlight-in", highlightOut: "highlight-out"};
   var CLASS_DELAYS = {highlightIn: 500, highlightKeep: 0, highlightOut: 200};
   var NO_ELEMENT = $();

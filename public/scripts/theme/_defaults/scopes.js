@@ -1,11 +1,13 @@
-"use strict";
-
 define("@{type.name}/@{id}/theme-defaults/scopes", function () {
+  "use strict";
+
   return function (shortcuts, theme) {
     theme.scopes = {
       getCurrent: function () {
         // if a dialog is opened, restrict scopes
         if (theme.dialogs.getOpened().length) { return ["dialog", "body"]; }
+        // if ACP, restrict scopes
+        if (app.inAdmin) { return ["acp", "body"]; }
 
         var scopes = [];
         // enable (minimized) composer if found

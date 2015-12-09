@@ -1,58 +1,69 @@
-"use strict";
+(function () {
+  "use strict";
 
-// define module to provide main instance of Core (e.g. for other plugins to extend actions, etc.)
-define("@{type.name}/@{id}/main", ["@{type.name}/@{id}/debug", "@{type.name}/@{id}/Core"], function (debug, Core) {
-  var defer = $.Deferred();
+  var $doc = $(document);
 
-  socket.emit("plugins.@{iD}", null, function (err, data) {
-    if (err != null) {
-      defer.reject(err);
-      return debug.error(err);
-    }
-    var settings = data.settings;
-    var $doc = $(document);
+  // define module to provide main instance of Core (e.g. for other plugins to extend actions, etc.)
+  define("@{type.name}/@{id}/main", ["@{type.name}/@{id}/debug", "@{type.name}/@{id}/Core"], function (debug, Core) {
+    var defer = $.Deferred();
 
-    debug.log("Settings", settings);
+    socket.emit("plugins.@{iD}", null, function (err, data) {
+      if (err != null) {
+        defer.reject(err);
+        return debug.error(err);
+      }
+      var settings = data.settings;
+      debug.log("Settings", settings);
 
-    $doc.ready(function () {
-      if (app.inAdmin) { return defer.reject("@{nbbpm.name} is deactivated for Admin CP."); }
-      // apply styles to document
-      var styles = ".@{id}-selection { box-shadow:0 0 5px 1px " + settings.selectionColor + " !important; }";
-      $("<style type=\"text/css\">" + styles + "</style>").appendTo("head");
-
-      // create main instance
-      var shortcuts = new Core(settings);
-      shortcuts.startWatching($doc);
-      defer.resolve(shortcuts);
+      $doc.ready(function () {
+        if (!app.inAdmin) {
+          // apply styles to document
+          var styles = ".@{id}-selection { box-shadow:0 0 5px 1px " + settings.selectionColor + " !important; }";
+          $("<style type=\"text/css\">" + styles + "</style>").appendTo("head");
+        }
+        // create main instance
+        var shortcuts = new Core(settings);
+        defer.resolve(shortcuts);
+      });
     });
+
+    return defer;
   });
 
-  return defer;
-});
+  $doc.ready(function () {
+    require([
+      "@{type.name}/@{id}/debug",
+      "@{type.name}/@{id}/main",
+      "@{type.name}/@{id}/theme-defaults"
+    ], function (debug, shortcuts, themeDefaults) {
+      shortcuts.done(function (shortcuts) {
+        // resolve theme module
+        var SUPPORTED_THEMES = ["lavender", "persona"];
+        var themeID = config["theme:id"].substring("nodebb-theme-".length);
 
-$(document).ready(function () {
-  if (app.inAdmin) { return; }
+        if (app.inAdmin) {
+          debug.log("In ACP.");
+          attachTheme();
+          shortcuts.startWatching($doc);
+        } else if (~SUPPORTED_THEMES.indexOf(themeID)) {
+          debug.log("Theme detected.", themeID);
+          require([
+            "@{type.name}/@{id}/themes/" + themeID + "/main",
+            "@{type.name}/@{id}/selection/Selection"
+          ], function (theme, Selection) {
+            attachTheme(theme);
+            attachSelection(Selection);
+            shortcuts.startWatching($doc);
+          });
+        } else {
+          debug.error("Theme not supported.", themeID);
+        }
 
-  require([
-    "@{type.name}/@{id}/debug",
-    "@{type.name}/@{id}/main",
-    "@{type.name}/@{id}/theme",
-    "@{type.name}/@{id}/selection/Selection",
-    "@{type.name}/@{id}/theme-defaults"
-  ], function (debug, shortcuts, theme, Selection, themeDefaults) {
-    shortcuts.done(function (shortcuts) {
-      // resolve theme module
-      var SUPPORTED_THEMES = ["lavender", "persona"];
-      var themeID = config["theme:id"].substring("nodebb-theme-".length);
-
-      if (~SUPPORTED_THEMES.indexOf(themeID)) {
-        debug.log("Theme detected.", themeID);
-
-        require(["@{type.name}/@{id}/themes/" + themeID + "/main"], function (theme) {
+        function attachTheme(theme) {
           // add theme related actions
           var result = {};
           themeDefaults(shortcuts, result);
-          theme(shortcuts, result);
+          if (typeof theme === "function") { theme(shortcuts, result); }
 
           var itemSelectorsJoined = "";
           for (var key in result.selection) {
@@ -63,7 +74,9 @@ $(document).ready(function () {
           result.itemSelectorsJoined = itemSelectorsJoined.substring(0, itemSelectorsJoined.length - 1);
 
           shortcuts.attachTheme(result);
+        }
 
+        function attachSelection(Selection) {
           // create new selection instance
           var selection = new Selection();
           $(window).on("action:ajaxify.start", function () { selection.reset(); });
@@ -94,11 +107,10 @@ $(document).ready(function () {
           );
           shortcuts.prependToAction("body.focus", function () { return selection.deselect(); });
 
-          selection.attachTheme(result);
-        });
-      } else {
-        debug.error("Theme not supported.", themeID);
-      }
+          selection.attachTheme(shortcuts.theme);
+        }
+      });
     });
   });
-});
+
+})();
