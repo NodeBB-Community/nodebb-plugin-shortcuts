@@ -28,28 +28,29 @@
 
       function dashCase(m) { return "-" + m.toLowerCase(); }
 
-      function getScopeField(key, id) {
+      function getScopeField(key, langKey, id) {
         var $el = $("<div class=\"form-group\"></div>");
         var $label = $("<label class=\"col-xs-12 col-sm-5 control-label\" for=\"" + id + "\"></label>").appendTo($el);
-        translator.translate("[[" + moduleId + ":" + key + "]]", function (str) { $label.text(str); });
+        translator.translate("[[" + moduleId + ":" + langKey + "]]", function (str) { $label.text(str); });
         var $input = $("<div id=\"" + id + "\" data-key=\"" + key + "\"></div>")
             .data({attributes: {class: "form-control", type: "key"}, split: " "});
         return $el.append($label).append($("<div class=\"col-xs-12 col-sm-7\"></div>").append($input));
       }
 
-      function addScopeFields($scopeElement, obj, key, id) {
-        var current, currentId, currentKey;
+      function addScopeFields($scopeElement, obj, key, langKey, id) {
+        var current, currentId, currentKey, currentLangKey;
         for (var k in obj) {
           if (obj.hasOwnProperty(k)) {
             current = obj[k];
             currentId = id + "-" + k;
             currentKey = key + "." + k;
+            currentLangKey = langKey + "." + k;
             if (typeof current === "object" && !(current instanceof Array)) {
-              addScopeFields($scopeElement, current, currentKey, currentId);
+              addScopeFields($scopeElement, current, currentKey, currentLangKey, currentId);
             } else {
               if (typeof current === "string") { current = [current]; }
               if (current instanceof Array) {
-                getScopeField(currentKey, moduleId + "-" + currentId.replace(/[A-Z]/g, dashCase))
+                getScopeField(currentKey, currentLangKey, moduleId + "-" + currentId.replace(/[A-Z]/g, dashCase))
                     .appendTo($scopeElement);
               }
             }
@@ -57,22 +58,22 @@
         }
       }
 
-      function getScopeElement(scope, actions, key) {
+      function getScopeElement(scope, actions, key, langKey) {
         var $scopeElement = $("<div class=\"col-xs-12 col-sm-6\"></div>");
         var $scopeHeader = $("<h3></h3>").appendTo($scopeElement);
         translator.translate("[[" + moduleId + ":actions." + scope + "]]", function (str) { $scopeHeader.text(str); });
-        addScopeFields($scopeElement, actions, key + "." + scope, "action");
+        addScopeFields($scopeElement, actions, key + "." + scope, langKey + "." + scope, "action");
         return $scopeElement;
       }
 
-      function addFields($target, actions, key) {
+      function addFields($target, actions, key, langKey) {
         for (var scope in actions) {
-          if (actions.hasOwnProperty(scope)) { getScopeElement(scope, actions[scope], key).appendTo($target); }
+          if (actions.hasOwnProperty(scope)) { getScopeElement(scope, actions[scope], key, langKey).appendTo($target); }
         }
       }
 
-      addFields($actionsWrapper, defaultSettings._.actions, "actions");
-      addFields($adminActionsWrapper, defaultSettings._.adminActions, "actions");
+      addFields($actionsWrapper, defaultSettings._.actions, "actions", "actions");
+      addFields($adminActionsWrapper, defaultSettings._.adminActions, "adminActions", "actions");
 
       /*========================================= Handle settings and buttons  =========================================*/
 

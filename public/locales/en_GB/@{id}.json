@@ -55,7 +55,7 @@
   "actions.composer.italic": "Make selected text italic",
   "actions.composer.list": "Make selected text a list-item",
   "actions.composer.link": "Make selected text a link-name",
-  "actions.header.admin": "Open the admin-page",
+  "actions.header.admin": "Go to the admin-page",
   "actions.header.home": "Go to home-page",
   "actions.header.categories": "Go to categories-page",
   "actions.header.unread": "Go to unread-page",
@@ -66,6 +66,6 @@
   "actions.header.groups": "Go to groups-page",
   "actions.header.notifications": "Go to notifications-page",
   "actions.header.profile": "Go to profile-page",
-  "actions.header.chats": "Open chat-popup",
-  "actions.header.search": "Enter the search-field"
+  "actions.header.chats": "Go to the chats-page",
+  "actions.header.search": "Focus the search-field"
 }
