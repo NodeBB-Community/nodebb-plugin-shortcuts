@@ -1,6 +1,8 @@
 define("@{type.name}/@{id}/theme-defaults/actions", function () {
   "use strict";
 
+  var lastBodyFocusAttempt = 0;
+
   return function (shortcuts, theme) {
     shortcuts.mergeActions(
         {
@@ -9,7 +11,15 @@ define("@{type.name}/@{id}/theme-defaults/actions", function () {
           },
 
           body: {
-            focus: function () {
+            focus: function (ignored, event) {
+              var $target = $(event.target);
+              if ($target.data("textComplete") != null || $target.data("uiAutocomplete") != null) {
+                // TODO try to find way of prohibiting body-focus only when auto-/text-complete is active
+                if (lastBodyFocusAttempt < new Date().getTime() - 500) {
+                  lastBodyFocusAttempt = new Date().getTime();
+                  return false;
+                }
+              }
               $(".open>[data-toggle=\"dropdown\"]").click();
               theme.utils.blurFocus();
             },
