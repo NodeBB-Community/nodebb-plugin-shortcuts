@@ -19,7 +19,7 @@
         if (!app.inAdmin) {
           // apply styles to document
           var styles = ".@{id}-selection { box-shadow:0 0 5px 1px " + settings.selectionColor + " !important; }";
-          $("<style type=\"text/css\">" + styles + "</style>").appendTo("head");
+          $("<style type=\"text/css\" id=\"styles-@{id}\">" + styles + "</style>").appendTo("head");
         }
         // create main instance
         var shortcuts = new Core(settings);
