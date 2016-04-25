@@ -110,6 +110,7 @@ define("@{type.name}/@{id}/theme-defaults/actions", function () {
             send: function () { $("button[data-action=\"post\"]", theme.composer.getActive())[0].click(); },
             discard: function () {
               var composer = theme.composer.getActive();
+              $(".title", composer).blur();
               $(".write", composer).blur();
               return $("button[data-action=\"discard\"]", composer)[0].click();
             },
