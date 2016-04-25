@@ -199,7 +199,7 @@ define("@{type.name}/@{id}/selection/Selection", [
    @returns Array The array of rearranged Areas.
   */
   Selection.prototype.rearrangeAreas = function (areas) {
-    var index = this.findAreaIndexWithSelection(areas, "[component=\"category/topic\"]");
+    var index = this.findAreaIndexWithSelection(areas, this.theme.selection.topics.selector);
     if (index !== -1) {
       return this.shiftLeft(areas, index);
     }
