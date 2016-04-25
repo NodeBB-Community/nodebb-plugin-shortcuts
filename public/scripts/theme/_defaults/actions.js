@@ -109,7 +109,10 @@ define("@{type.name}/@{id}/theme-defaults/actions", function () {
           composer: {
             send: function () { $("button[data-action=\"post\"]", theme.composer.getActive())[0].click(); },
             discard: function () {
-              return $("button[data-action=\"discard\"]", theme.composer.getActive())[0].click();
+              var composer = theme.composer.getActive();
+              $(".title", composer).blur();
+              $(".write", composer).blur();
+              return $("button[data-action=\"discard\"]", composer)[0].click();
             },
             closed: {
               input: function () {
