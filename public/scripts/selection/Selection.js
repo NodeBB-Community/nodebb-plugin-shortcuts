@@ -188,8 +188,47 @@ define("@{type.name}/@{id}/selection/Selection", [
         areas.push(area);
       }
     });
+    areas = this.rearrangeAreas(areas);
     debug.log("Selection Areas refreshed", areas);
     return areas;
+  };
+
+  /**
+   Rearrange selection Areas such that topic selection is always the first.
+   @param areas The selection Areas.
+   @returns Array The array of rearranged Areas.
+  */
+  Selection.prototype.rearrangeAreas = function (areas) {
+    var index = this.findAreaIndexWithSelection(areas, "[component=\"category/topic\"]");
+    if (index !== -1) {
+      return this.shiftLeft(areas, index);
+    }
+    return areas;
+  };
+
+  /**
+   Find the Area's index that contains the specified selector prefix.
+   @param areas The selection Areas.
+   @param selectorPrefix The selector string prefix.
+   @returns Integer The index of the Area found, otherwise return -1.
+  */
+  Selection.prototype.findAreaIndexWithSelection = function (areas, selectorPrefix) {
+    for (var i = 0; i < areas.length; i++) {
+      if (areas[i].hooks.selector.startsWith(selectorPrefix)) {
+        return i;
+      }
+    }
+    return -1;
+  };
+
+  /**
+   Rotate an array to the left by n steps.
+   @param list The input array.
+   @param steps The number of steps to rotate left.
+   @returns The rotated array.
+  */
+  Selection.prototype.shiftLeft = function (list, steps) {
+    return list.slice(steps).concat(list.slice(0, steps));
   };
 
   /**
