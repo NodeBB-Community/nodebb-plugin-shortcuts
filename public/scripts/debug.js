@@ -6,20 +6,21 @@ define("@{type.name}/@{id}/debug", function () {
 
   var exports = {
     enabled: dev,
+
     _log: function () {
-      var args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-      console.log.apply(console, ["@{name} DEBUG -"].concat(__slice.call(args)));
-    },
-    log: function () {
-      var args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-      if (dev) { exports._log.apply(null, args); }
+      console.log.apply(console, ["@{name} DEBUG -"].concat(__slice.call(arguments)));
     },
     error: function () {
       console.error.apply(console, ["@{name} ERROR -"].concat(__slice.call(arguments)));
     }
   };
 
-  exports.log("Debug-mode is enabled.");
+  if (dev) {
+    exports.log = exports._log;
+    exports.log("Debug-mode is enabled.");
+  } else {
+    exports.log = $.noop;
+  }
 
   return exports;
 });
