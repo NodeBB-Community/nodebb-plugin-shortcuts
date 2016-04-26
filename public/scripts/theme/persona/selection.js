@@ -2,14 +2,50 @@ define("@{type.name}/@{id}/themes/persona/selection", ["@{type.name}/@{id}/selec
   "use strict";
 
   return function (shortcuts, theme) {
-    theme.selection = {
-      posts: {
+    var dropDownSelector = { // dropDowns
+      selector: "[data-toggle=\"dropdown\"]:not([disabled])",
+      isParent: true,
+      force: true, // topic- and post-tools get lazy-loaded on-focus
+      getArea: function () {
+        if (this.parent().is("#header-menu *")) { return false; }
+        var area = new Area(this.parent());
+        area.setHooks({
+          selector: ">ul>li:not(.divider,.dropdown-header)",
+          focus: dropDownSelector.focus,
+          blur: dropDownSelector.blur,
+          follow: dropDownSelector.follow
+        });
+        return area;
+      },
+      focus: {
+        area: function () {
+          if (!this.parent.hasClass("open")) { $("[data-toggle=\"dropdown\"]:not([disabled])", this.parent).click(); }
+          setTimeout(theme.utils.blurFocus, 50);
+        },
+        item: function () {
+          var grandpa = this.parent().parent();
+          if (!grandpa.hasClass("open")) { $("[data-toggle=\"dropdown\"]:not([disabled])", grandpa).click(); }
+          setTimeout(theme.utils.blurFocus, 50);
+        }
+      },
+      blur: {
+        area: function () {
+          if (this.parent.hasClass("open")) { $("[data-toggle=\"dropdown\"]:not([disabled])", this.parent).click(); }
+        }
+      },
+      follow: [
+        function () { $(">*", this).focus()[0].click(); }
+      ]
+    };
+
+    theme.selection = [
+      { // posts
         selector: "[component=\"post\"]",
         follow: [
           function () { ajaxify.go("topic/" + ajaxify.data.slug + "/" + (1 + this.data("index"))); }
         ]
       },
-      topics: {
+      { // topics
         selector: "[component=\"category/topic\"]",
         follow: [
           function () {
@@ -23,13 +59,13 @@ define("@{type.name}/@{id}/themes/persona/selection", ["@{type.name}/@{id}/selec
           }
         ]
       },
-      categories: {
+      { // categories
         selector: "[component=\"categories/category\"], .subcategories>[data-cid]",
         follow: [
           function () { ajaxify.go("category/" + this.data("cid")); }
         ]
       },
-      notifications: {
+      { // notifications
         selector: ".notifications-list>[component=\"notifications/item\"]",
         follow: [
           function () {
@@ -38,7 +74,7 @@ define("@{type.name}/@{id}/themes/persona/selection", ["@{type.name}/@{id}/selec
           }
         ]
       },
-      users: {
+      { // users
         selector: ".users-container>li",
         follow: [
           function () {
@@ -47,7 +83,7 @@ define("@{type.name}/@{id}/themes/persona/selection", ["@{type.name}/@{id}/selec
           }
         ]
       },
-      groups: {
+      { // groups
         selector: "[component=\"groups/summary\"]",
         getClassElement: function () { return this.children().eq(0); },
         follow: [
@@ -57,7 +93,7 @@ define("@{type.name}/@{id}/themes/persona/selection", ["@{type.name}/@{id}/selec
           }
         ]
       },
-      tags: {
+      { // tags
         selector: ".tag-list>.tag-container",
         follow: [
           function () {
@@ -67,46 +103,15 @@ define("@{type.name}/@{id}/themes/persona/selection", ["@{type.name}/@{id}/selec
         ],
         getClassElement: function () { return this.children().eq(0); }
       },
-      chats_recent: {
+      { // chats_recent
         selector: "[component=\"chat/recent\"]>li",
         getClassElement: function () { return this.find(".user-icon,.username"); },
         follow: [
           function () { this[0].click(); }
         ]
       },
-      dropDowns: {
-        selector: "[data-toggle=\"dropdown\"]:not([disabled])",
-        getArea: function () {
-          if (this.parent().is("#header-menu *")) { return false; }
-          var area = new Area(this.parent());
-          area.setHooks({
-            selector: ">ul>li:not(.divider,.dropdown-header)",
-            focus: theme.selection.dropDowns.focus,
-            blur: theme.selection.dropDowns.blur,
-            follow: theme.selection.dropDowns.follow
-          });
-          return area;
-        },
-        focus: {
-          area: function () {
-            if (!this.parent.hasClass("open")) { $("[data-toggle=\"dropdown\"]:not([disabled])", this.parent).click(); }
-            setTimeout(theme.utils.blurFocus, 50);
-          },
-          item: function () {
-            var grandpa = this.parent().parent();
-            if (!grandpa.hasClass("open")) { $("[data-toggle=\"dropdown\"]:not([disabled])", grandpa).click(); }
-            setTimeout(theme.utils.blurFocus, 50);
-          }
-        },
-        blur: {
-          area: function () {
-            if (this.parent.hasClass("open")) { $("[data-toggle=\"dropdown\"]:not([disabled])", this.parent).click(); }
-          }
-        },
-        follow: [
-          function () { $(">*", this).focus()[0].click(); }
-        ]
-      }
-    };
+      dropDownSelector
+    ];
   };
+
 });

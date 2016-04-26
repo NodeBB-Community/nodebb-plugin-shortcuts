@@ -162,74 +162,41 @@ define("@{type.name}/@{id}/selection/Selection", [
   Selection.prototype.refreshAreas = function () {
     if (this.theme == null) { return []; }
     var theme = this.theme;
-    var areas = [], items = [];
-    // iterate all relevant elements
-    $(theme.itemSelectorsJoined).each(function (ignored, item) {
-      if (~items.indexOf(item)) { return; } // each item may only resolve to one area
-      var $item = $(item);
-      var area = null;
-      for (var key in theme.selection) {
-        if (theme.selection.hasOwnProperty(key)) {
-          var value = theme.selection[key];
-          if ($item.is(value.selector)) {
-            // get associated area object
-            area = typeof value.getArea === "function" ? value.getArea.call($item) : null;
-            if (area === false) { return; }
-            if (area == null) { area = new Area($item.parent()); }
-            if (area.hooks == null) { area.setHooks(value); }
-            if (area.items == null) { area.refreshItems(); }
-            break;
-          }
+    var areas = [];
+    var i, selection, items, area, _len = theme.selection.length;
+    for (i = 0; i < _len; i++) {
+      selection = theme.selection[i];
+      items = $(selection.selector);
+      if (items.length) {
+        if (selection.isParent) {
+          items.each(function (ignored, item) {
+            area = createArea(selection, $(item));
+            if (area != null && (area.items.length || selection.force)) { areas.push(area); }
+          });
+        } else {
+          area = createArea(selection, items.eq(0).parent());
+          if (area != null && (area.items.length || selection.force)) { areas.push(area); }
         }
       }
-      // track items and area
-      if (area != null) {
-        area.items.each(function (ignored, elem) { items.push(elem); });
-        areas.push(area);
-      }
-    });
-    areas = this.rearrangeAreas(areas);
+    }
     debug.log("Selection Areas refreshed", areas);
     return areas;
   };
 
   /**
-   Rearrange selection Areas such that topic selection is always the first.
-   @param areas The selection Areas.
-   @returns Array The array of rearranged Areas.
-  */
-  Selection.prototype.rearrangeAreas = function (areas) {
-    var index = this.findAreaIndexWithSelection(areas, this.theme.selection.topics.selector);
-    if (index !== -1) {
-      return this.shiftLeft(areas, index);
-    }
-    return areas;
-  };
-
-  /**
-   Find the Area's index that contains the specified selector prefix.
-   @param areas The selection Areas.
-   @param selectorPrefix The selector string prefix.
-   @returns Integer The index of the Area found, otherwise return -1.
-  */
-  Selection.prototype.findAreaIndexWithSelection = function (areas, selectorPrefix) {
-    for (var i = 0; i < areas.length; i++) {
-      if (areas[i].hooks.selector.startsWith(selectorPrefix)) {
-        return i;
-      }
-    }
-    return -1;
-  };
-
-  /**
-   Rotate an array to the left by n steps.
-   @param list The input array.
-   @param steps The number of steps to rotate left.
-   @returns The rotated array.
-  */
-  Selection.prototype.shiftLeft = function (list, steps) {
-    return list.slice(steps).concat(list.slice(0, steps));
-  };
+   * Creates a new Selection-Area with the given selector.
+   * @param selector The selector object as defined by the theme.
+   * @param parent The jQuery element to use as parent element.
+   * @returns {null|Area}
+   */
+  function createArea(selector, parent) {
+    var area = typeof selector.getArea === "function" ? selector.getArea.call(parent) : null;
+    if (area === false) { return null; }
+    if (area == null) { area = new Area(parent); }
+    if (area.hooks == null) { area.setHooks(selector); }
+    if (area.items == null) { area.refreshItems(); }
+    return area;
+  }
 
   /**
    Selects the Area at given index within this.areas.
