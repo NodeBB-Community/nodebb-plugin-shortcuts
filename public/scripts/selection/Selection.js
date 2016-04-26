@@ -169,10 +169,7 @@ define("@{type.name}/@{id}/selection/Selection", [
       items = $(selection.selector);
       if (items.length) {
         if (selection.isParent) {
-          items.each(function (ignored, item) {
-            area = createArea(selection, $(item));
-            if (area != null && (area.items.length || selection.force)) { areas.push(area); }
-          });
+          items.each(addAreaByParent);
         } else {
           area = createArea(selection, items.eq(0).parent());
           if (area != null && (area.items.length || selection.force)) { areas.push(area); }
@@ -181,6 +178,11 @@ define("@{type.name}/@{id}/selection/Selection", [
     }
     debug.log("Selection Areas refreshed", areas);
     return areas;
+
+    function addAreaByParent(ignored, item) {
+      var area = createArea(selection, $(item));
+      if (area != null && (area.items.length || selection.force)) { areas.push(area); }
+    }
   };
 
   /**
