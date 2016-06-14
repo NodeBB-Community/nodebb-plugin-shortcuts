@@ -107,7 +107,11 @@ define("@{type.name}/@{id}/theme-defaults/actions", function () {
           topic: {reply: function () { return $("[component=\"topic/reply\"]").first().click().length > 0; }},
 
           composer: {
-            send: function () { $("button[data-action=\"post\"]", theme.composer.getActive())[0].click(); },
+            send: function () {
+              var btn = $("button[data-action=\"post\"]:visible", theme.composer.getActive())[0];
+              if (!btn) { return false; }
+              btn.click();
+            },
             discard: function () {
               var composer = theme.composer.getActive();
               $(".title", composer).blur();
@@ -135,7 +139,9 @@ define("@{type.name}/@{id}/theme-defaults/actions", function () {
               if (composer == null) { return false; }
               var $togglePreview = $(".toggle-preview:visible", composer);
               if ($(".preview-container:visible", composer).length || !$togglePreview.length) {
-                $("button[data-action=\"post\"]", composer)[0].click();
+                var btn = $("button[data-action=\"post\"]:visible", composer)[0];
+                if (!btn) { return false; }
+                btn.click();
               } else {
                 return $togglePreview.click().length > 0;
               }
